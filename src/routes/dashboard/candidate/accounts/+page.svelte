@@ -12,7 +12,6 @@
 
 		if (!session) {
 			goto('/login');
-			return;
 		}
 
 	async function completeStep() {
