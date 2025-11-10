@@ -1,70 +1,88 @@
 <script>
-    import { supabase, user } from '$lib/supabaseClient';
-    import { goto } from '$app/navigation';
-  
-    let fullName = '';
-    let email = '';
-    let password = '';
-    let acceptTerms = false;
-    let role = 'candidate'; // default role
-    let loading = false;
-  
-    // Bootstrap alert messages
-    let message = '';
-    let messageType = ''; // 'success' or 'danger'
-  
-    async function signUp(e) {
-      e.preventDefault();
-      message = '';
-      messageType = '';
-  
-      if (!acceptTerms) {
-        message = 'You must accept the Terms and Conditions';
-        messageType = 'danger';
-        return;
-      }
-  
-      loading = true;
-  
-      // Sign up user
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password
-      });
-  
-      if (authError) {
-        message = authError.message;
-        messageType = 'danger';
-        loading = false;
-        return;
-      }
-  
-      // Create user profile
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .insert([{ id: authData.user.id, full_name: fullName, role }]);
-  
-      if (profileError) {
-        message = profileError.message;
-        messageType = 'danger';
-        loading = false;
-        return;
-      }
-  
-      user.set(profileData[0]);
-      message = 'Signup successful! Redirecting...';
-      messageType = 'success';
-  
-      // Wait a bit to show message before redirect
-      setTimeout(() => {
-        if (role === 'admin') goto('/dashboard/admin');
-        else if (role === 'agent') goto('/dashboard/agent');
-        else goto('/dashboard/candidate');
-      }, 1500);
-  
-      loading = false;
-    }
-  </script>
+	import { supabase } from '$lib/supabaseClient';
+	import { goto } from '$app/navigation';
+
+	let fullName = '';
+	let email = '';
+	let password = '';
+	let acceptTerms = false;
+	let role = 'candidate'; // static here, but could allow choose later
+	let loading = false;
+
+	let message = '';
+	let messageType = '';
+
+	async function signUp(e) {
+		e.preventDefault();
+		message = '';
+		messageType = '';
+
+		if (!acceptTerms) {
+			message = 'You must accept the Terms and Conditions';
+			messageType = 'danger';
+			return;
+		}
+
+		loading = true;
+
+		// 1. Create User + pass role into metadata
+		const { data: authData, error: authError } = await supabase.auth.signUp({
+			email,
+			password,
+			options: {
+				data: { role } // stored as raw_user_meta_data.role in auth
+			}
+		});
+
+		if (authError) {
+			message = authError.message;
+			messageType = 'danger';
+			loading = false;
+			return;
+		}
+
+		const user = authData.user;
+		if (!user) {
+			message = 'Unexpected error. Try again.';
+			messageType = 'danger';
+			loading = false;
+			return;
+		}
+
+		// Extract first + last names from fullName
+		const [first_name, ...rest] = fullName.trim().split(' ');
+		const last_name = rest.join(' ') || '';
+
+		// 2. Insert Candidate record
+		const { error: candidateError } = await supabase.from('candidates').insert([
+			{
+				user_id: user.id,
+				first_name,
+				last_name,
+				onboarding_status: 'started', // or null
+				profile_completeness: 0,
+				visibility: 'private'
+			}
+		]);
+
+		if (candidateError) {
+			message = candidateError.message;
+			messageType = 'danger';
+			loading = false;
+			return;
+		}
+
+		message = 'Signup successful! Redirecting...';
+		messageType = 'success';
+
+		setTimeout(() => {
+			goto('/dashboard/candidate/onboarding');
+		}, 1000);
+
+		loading = false;
+	}
+</script>
+
   
   <div class="account-pages pt-2 pt-sm-5 pb-4 pb-sm-5">
     <div class="container">

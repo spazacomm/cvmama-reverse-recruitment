@@ -253,7 +253,7 @@
                        </a>
                        <div class="dropdown-menu dropdown-menu-end">
                            <!-- item-->
-                           <h6 class="dropdown-header">{profile?.full_name}</h6>
+                           <h6 class="dropdown-header">{profile?.first_name}</h6>
                            <a class="dropdown-item" href="pages-profile.html">
                                <i
                                    class="bx bx-user-circle text-muted fs-18 align-middle me-1"
@@ -357,14 +357,14 @@
                    <div class="collapse" id="sidebarDashboards">
                        <ul class="nav sub-navbar-nav">
                            <li class="sub-nav-item">
-                               <a class="sub-nav-link" href="index.html"
+                               <a class="sub-nav-link" href="/candidate/dashboard"
                                    >Overview</a
                                >
                            </li>
                            <li class="sub-nav-item">
                                <a
                                    class="sub-nav-link"
-                                   href="/dashboard/candidate/onboarding"
+                                   href="/candidate/onboarding"
                                    >Onboarding</a
                                >
                            </li>

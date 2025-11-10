@@ -1,64 +1,93 @@
 <script>
-    import { supabase, user } from '$lib/supabaseClient';
-    import { goto } from '$app/navigation';
-  
-    let email = '';
-    let password = '';
-    let remember = false;
-    let loading = false;
-  
-    // Bootstrap alert messages
-    let message = '';
-    let messageType = ''; // 'success' or 'danger'
-  
-    async function login(e) {
-      e.preventDefault();
-      message = '';
-      messageType = '';
-      loading = true;
-  
-      const { data: session, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-  
-      if (error) {
-        message = error.message;
-        messageType = 'danger';
-        loading = false;
-        return;
-      }
-  
-      // Get user profile
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role, full_name')
-        .eq('id', session.user.id)
-        .single();
-  
-      if (profileError || !profile) {
-        message = 'Profile not found';
-        messageType = 'danger';
-        loading = false;
-        return;
-      }
-  
-      user.set(profile);
-  
-      // Success message
-      message = 'Login successful! Redirecting...';
-      messageType = 'success';
-  
-      // Redirect based on role after short delay
-      setTimeout(() => {
-        if (profile.role === 'admin') goto('/dashboard/admin');
-        else if (profile.role === 'agent') goto('/dashboard/agent');
-        else goto('/dashboard/candidate');
-      }, 1200);
-  
-      loading = false;
-    }
-  </script>
+	import { supabase, user } from '$lib/supabaseClient';
+	import { goto } from '$app/navigation';
+
+	let email = '';
+	let password = '';
+	let remember = false;
+	let loading = false;
+
+	let message = '';
+	let messageType = '';
+
+	async function login(e) {
+		e.preventDefault();
+		message = '';
+		messageType = '';
+		loading = true;
+
+		const { data, error } = await supabase.auth.signInWithPassword({
+			email,
+			password
+		});
+
+		if (error) {
+			message = error.message;
+			messageType = 'danger';
+			loading = false;
+			return;
+		}
+
+		const authUser = data.user;
+		if (!authUser) {
+			message = 'Login failed. Try again.';
+			messageType = 'danger';
+			loading = false;
+			return;
+		}
+
+		// Get role from user metadata
+		const role = authUser.user_metadata?.role || 'candidate';
+
+		let profile = null;
+
+		// If the user is a candidate, fetch candidate record
+		if (role === 'candidate') {
+			const { data: candidate, error: candidateError } = await supabase
+				.from('candidates')
+				.select('first_name, last_name, onboarding_status')
+				.eq('user_id', authUser.id)
+				.single();
+
+			if (candidateError) {
+				message = 'Candidate profile not found.';
+				messageType = 'danger';
+				loading = false;
+				return;
+			}
+
+			profile = { role, ...candidate };
+		} else {
+			// Admin or Agent → no candidates record needed
+			profile = { role };
+		}
+
+		// Save profile globally
+		user.set(profile);
+
+		message = 'Login successful! Redirecting...';
+		messageType = 'success';
+
+		setTimeout(() => {
+			if (role === 'admin') {
+				goto('/dashboard/admin');
+			} else if (role === 'agent') {
+				goto('/dashboard/agent');
+			} else {
+				// Candidate routing logic based on onboarding status
+				if (profile.onboarding_status !== 'completed') {
+					goto('/candidate/onboarding');
+				} else {
+					goto('/candidate/dashboard');
+				}
+			}
+		}, 800);
+
+		loading = false;
+	}
+</script>
+
+
   
   <div class="account-pages pt-2 pt-sm-5 pb-4 pb-sm-5">
     <div class="container">

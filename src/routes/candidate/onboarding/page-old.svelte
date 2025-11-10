@@ -50,7 +50,7 @@
 					<div class="card-body p-4">
 
 						<div class="text-center mb-4">
-							<img src="/assets/images/logo-dark.png" height="26" alt="logo" />
+							<!-- 	<img src="/assets/images/logo-dark.png" height="26" alt="logo" /> -->
 							<h4 class="mt-3 mb-1 fw-bold">Welcome to cvmama</h4>
 							<p class="text-muted">Before we begin, help us understand you better.</p>
 						</div>
