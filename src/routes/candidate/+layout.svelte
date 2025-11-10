@@ -339,102 +339,80 @@
                <li class="menu-title">General</li>
 
                <li class="nav-item">
-                   <a
-                       class="nav-link menu-arrow"
-                       href="#sidebarDashboards"
-                       data-bs-toggle="collapse"
-                       role="button"
-                       aria-expanded="false"
-                       aria-controls="sidebarDashboards"
-                   >
-                       <span class="nav-icon">
-                           <iconify-icon
-                               icon="iconamoon:home-duotone"
-                           ></iconify-icon>
-                       </span>
-                       <span class="nav-text"> Dashboards </span>
-                   </a>
-                   <div class="collapse" id="sidebarDashboards">
-                       <ul class="nav sub-navbar-nav">
-                           <li class="sub-nav-item">
-                               <a class="sub-nav-link" href="/candidate/dashboard"
-                                   >Overview</a
-                               >
-                           </li>
-                           <li class="sub-nav-item">
-                               <a
-                                   class="sub-nav-link"
-                                   href="/candidate/onboarding"
-                                   >Onboarding</a
-                               >
-                           </li>
-                          
-                       </ul>
-                   </div>
-               </li>
-
-
-               <li class="menu-title">Apps</li>
-
-               <li class="nav-item">
-                <a
-                    class="nav-link menu-arrow"
-                    href="#sidebarJobs"
-                    data-bs-toggle="collapse"
-                    role="button"
-                    aria-expanded="false"
-                    aria-controls="sidebarJobs"
-                >
+                <a class="nav-link" href="/candidate/dashboard">
                     <span class="nav-icon">
                         <iconify-icon
-                            icon="iconamoon:attachment-duotone"
+                            icon="iconamoon:home-duotone"
+                        ></iconify-icon>
+                    </span>
+                    <span class="nav-text"> Overview </span>
+                </a>
+            </li>
+
+
+            <li class="nav-item">
+                <a class="nav-link" href="/candidate/jobs">
+                    <span class="nav-icon">
+                        <iconify-icon
+                            icon="iconamoon:home-duotone"
                         ></iconify-icon>
                     </span>
                     <span class="nav-text"> Jobs </span>
                 </a>
-                <div class="collapse" id="sidebarJobs">
-                    <ul class="nav sub-navbar-nav">
-                        <li class="sub-nav-item">
-                            <a class="sub-nav-link" href="index.html"
-                                >Discover</a
-                            >
-                        </li>
-                        <li class="sub-nav-item">
-                            <a
-                                class="sub-nav-link"
-                                href="dashboard-finance.html"
-                                >Saved</a
-                            >
-                        </li>
-                        <li class="sub-nav-item">
-                            <a
-                                class="sub-nav-link"
-                                href="dashboard-finance.html"
-                                >Delegated</a
-                            >
-                        </li>
-                        <li class="sub-nav-item">
-                            <a
-                                class="sub-nav-link"
-                                href="dashboard-finance.html"
-                                >Applied</a
-                            >
-                        </li>
-                       
-                    </ul>
-                </div>
             </li>
 
+              
+
+
+               <li class="menu-title">Apps</li>
+
+             
+
             <li class="nav-item">
-                <a class="nav-link" href="apps-chat.html">
+                <a class="nav-link" href="/candidate/messages">
                     <span class="nav-icon">
                         <iconify-icon
                             icon="iconamoon:comment-dots-duotone"
                         ></iconify-icon>
                     </span>
-                    <span class="nav-text"> Chat </span>
+                    <span class="nav-text"> Messages </span>
                 </a>
             </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="/candidate/documents">
+                    <span class="nav-icon">
+                        <iconify-icon
+                            icon="iconamoon:attachment-duotone"
+                        ></iconify-icon>
+                    </span>
+                    <span class="nav-text"> Documents </span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="/candidate/agent">
+                    <span class="nav-icon">
+                        <iconify-icon
+                            icon="iconamoon:comment-dots-duotone"
+                        ></iconify-icon>
+                    </span>
+                    <span class="nav-text"> My Agent </span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="/candidate/subscription">
+                    <span class="nav-icon">
+                        <iconify-icon
+                            icon="iconamoon:comment-dots-duotone"
+                        ></iconify-icon>
+                    </span>
+                    <span class="nav-text"> Subscription </span>
+                </a>
+            </li>
+
+            
 
 
             <li class="nav-item">
@@ -451,29 +429,23 @@
                             icon="iconamoon:attention-circle-duotone"
                         ></iconify-icon>
                     </span>
-                    <span class="nav-text"> Profile </span>
+                    <span class="nav-text"> Settings </span>
                 </a>
                 <div class="collapse" id="sidebarProfile">
                     <ul class="nav sub-navbar-nav">
                         <li class="sub-nav-item">
-                            <a class="sub-nav-link" href="index.html"
+                            <a class="sub-nav-link" href="/candidate/profile"
                                 >Profile</a
                             >
                         </li>
                         <li class="sub-nav-item">
                             <a
                                 class="sub-nav-link"
-                                href="dashboard-finance.html"
+                                href="/candidate/accounts"
                                 >Connected Accounts</a
                             >
                         </li>
-                        <li class="sub-nav-item">
-                            <a
-                                class="sub-nav-link"
-                                href="dashboard-finance.html"
-                                >Subscription</a
-                            >
-                        </li>
+                       
                        
                     </ul>
                 </div>

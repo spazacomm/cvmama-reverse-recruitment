@@ -1,106 +1,292 @@
-<script>
-	import { supabase } from '$lib/supabaseClient';
-	import { goto } from '$app/navigation';
+<div class="container-xxl">
 
-	let message = null;
-	let messageType = 'success';
-	let loading = false;
+    <div class="col-md-9 col-lg-10 px-4 py-4">
 
+                <div id="accounts-page" class="page-section">
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h2 class="mb-1">Linked Accounts</h2>
+                            <p class="text-muted">Connect your accounts to enable your agent to apply for jobs on your behalf</p>
+                        </div>
+                    </div>
 
-	async function completeStep() {
-		loading = true;
+                    <!-- Info Banner -->
+                    <div class="alert alert-info d-flex align-items-start mb-4" role="alert">
+                        <i class="bi bi-info-circle-fill me-3 flex-shrink-0" style="font-size: 1.5rem;"></i>
+                        <div>
+                            <h6 class="alert-heading mb-2">Why Link Your Accounts?</h6>
+                            <p class="mb-2">Linking your accounts allows your career agent to:</p>
+                            <ul class="mb-0">
+                                <li>Apply to jobs directly on your behalf</li>
+                                <li>Manage your job applications efficiently</li>
+                                <li>Track all applications in one place</li>
+                                <li>Respond to employer communications quickly</li>
+                            </ul>
+                            <p class="mb-0 mt-2"><strong>Security:</strong> All credentials are encrypted and securely stored. Your agent will only use these accounts for job search activities with your permission.</p>
+                        </div>
+                    </div>
 
-		
+                    <!-- Account Options -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="mb-3">Choose Your Preference</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100 border-primary" style="cursor: pointer;">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-key-fill text-primary" style="font-size: 3rem;"></i>
+                                            <h5 class="mt-3">Use My Existing Accounts</h5>
+                                            <p class="text-muted">Connect your existing email and job site accounts. You maintain full control and access.</p>
+                                            <div class="form-check mt-3">
+                                                <input class="form-check-input" type="radio" name="accountMode" id="existingMode" checked>
+                                                <label class="form-check-label" for="existingMode">
+                                                    I'll provide my credentials
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100 border-secondary" style="cursor: pointer;">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-plus-circle-fill text-secondary" style="font-size: 3rem;"></i>
+                                            <h5 class="mt-3">Create Dedicated Accounts</h5>
+                                            <p class="text-muted">We'll create separate job search accounts for you. Keep your personal accounts private.</p>
+                                            <div class="form-check mt-3">
+                                                <input class="form-check-input" type="radio" name="accountMode" id="dedicatedMode">
+                                                <label class="form-check-label" for="dedicatedMode">
+                                                    Create new accounts for me
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-		const { error } = await supabase
-			.from('profiles')
-			.update({ accounts_connected: true })
-			.eq('id', session.user.id);
+                    <!-- Email Account -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-0">
+                                        <i class="bi bi-envelope-fill text-primary me-2"></i>Email Account
+                                    </h5>
+                                    <small class="text-muted">For receiving job alerts and employer communications</small>
+                                </div>
+                                <span class="badge bg-success">Connected</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="bi bi-envelope-check-fill text-success me-3" style="font-size: 2rem;"></i>
+                                        <div>
+                                            <h6 class="mb-0">sarah.johnson@example.com</h6>
+                                            <small class="text-muted">Connected on Nov 1, 2025</small>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-success mb-0">
+                                        <small><i class="bi bi-check-circle me-1"></i> Your agent can now manage job-related emails on your behalf</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <button class="btn btn-outline-primary mb-2 w-100" data-bs-toggle="modal" data-bs-target="#emailSettingsModal">
+                                        <i class="bi bi-gear me-1"></i>Settings
+                                    </button>
+                                    <button class="btn btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#disconnectModal">
+                                        <i class="bi bi-x-circle me-1"></i>Disconnect
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-		if (error) {
-			message = error.message;
-			messageType = 'danger';
-			loading = false;
-			return;
-		}
+                    <!-- LinkedIn Account -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-0">
+                                        <i class="bi bi-linkedin text-primary me-2"></i>LinkedIn
+                                    </h5>
+                                    <small class="text-muted">For Easy Apply and networking opportunities</small>
+                                </div>
+                                <span class="badge bg-success">Connected</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <img src="https://ui-avatars.com/api/?name=Sarah+Johnson&background=0077b5&color=fff&size=64" 
+                                             alt="LinkedIn" class="rounded-circle me-3" width="64" height="64">
+                                        <div>
+                                            <h6 class="mb-0">Sarah Johnson</h6>
+                                            <small class="text-muted">linkedin.com/in/sarahjohnson</small><br>
+                                            <small class="text-muted">Connected on Nov 1, 2025</small>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-warning mb-0">
+                                        <small><i class="bi bi-exclamation-triangle me-1"></i> LinkedIn Easy Apply permissions expire in 30 days. You'll need to reconnect.</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <button class="btn btn-outline-primary mb-2 w-100">
+                                        <i class="bi bi-arrow-clockwise me-1"></i>Refresh Connection
+                                    </button>
+                                    <button class="btn btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#disconnectModal">
+                                        <i class="bi bi-x-circle me-1"></i>Disconnect
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-		message = 'Step complete! Redirecting...';
-		messageType = 'success';
+                    <!-- Job Sites Section -->
+                    <h5 class="mb-3">Job Sites</h5>
 
-		setTimeout(() => goto('/onboarding/roadmap'), 1200);
-	}
-</script>
+                    <!-- Indeed -->
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-1 text-center">
+                                    <img src="https://ui-avatars.com/api/?name=Indeed&background=2164f3&color=fff&size=64" 
+                                         alt="Indeed" class="rounded" width="64" height="64">
+                                </div>
+                                <div class="col-md-7">
+                                    <h6 class="mb-1">Indeed</h6>
+                                    <p class="text-muted mb-2">World's largest job site with millions of listings</p>
+                                    <span class="badge bg-success">Connected</span>
+                                    <small class="text-muted ms-2">• Connected on Nov 2, 2025</small>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <button class="btn btn-sm btn-outline-primary me-2">
+                                        <i class="bi bi-gear"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#disconnectModal">
+                                        <i class="bi bi-x-circle me-1"></i>Disconnect
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-<div class="account-pages pt-2 pt-sm-5 pb-4 pb-sm-5">
-	<div class="container">
-		<div class="row justify-content-center">
-			<div class="col-xl-6">
+                    <!-- Fuzu -->
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-1 text-center">
+                                    <img src="https://ui-avatars.com/api/?name=Fuzu&background=00a86b&color=fff&size=64" 
+                                         alt="Fuzu" class="rounded" width="64" height="64">
+                                </div>
+                                <div class="col-md-7">
+                                    <h6 class="mb-1">Fuzu</h6>
+                                    <p class="text-muted mb-2">Leading job portal in East Africa</p>
+                                    <span class="badge bg-secondary">Not Connected</span>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#connectAccountModal" >
+                                        <i class="bi bi-plus-circle me-1"></i>Connect Account
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-				<div class="card auth-card">
-					<div class="card-body p-4">
+                    <!-- BrighterMonday -->
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-1 text-center">
+                                    <img src="https://ui-avatars.com/api/?name=BrighterMonday&background=ff6b35&color=fff&size=64" 
+                                         alt="BrighterMonday" class="rounded" width="64" height="64">
+                                </div>
+                                <div class="col-md-7">
+                                    <h6 class="mb-1">BrighterMonday</h6>
+                                    <p class="text-muted mb-2">East Africa's leading job board</p>
+                                    <span class="badge bg-secondary">Not Connected</span>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#connectAccountModal" >
+                                        <i class="bi bi-plus-circle me-1"></i>Connect Account
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-						<div class="text-center mb-4">
-							<img src="/assets/images/logo-dark.png" height="26" alt="logo" />
-							<h4 class="mt-3 mb-1 fw-bold">Connect Your Accounts</h4>
-							<p class="text-muted">We use your accounts to automate job applications.</p>
-						</div>
+                    <!-- Glassdoor -->
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-1 text-center">
+                                    <img src="https://ui-avatars.com/api/?name=Glassdoor&background=0caa41&color=fff&size=64" 
+                                         alt="Glassdoor" class="rounded" width="64" height="64">
+                                </div>
+                                <div class="col-md-7">
+                                    <h6 class="mb-1">Glassdoor</h6>
+                                    <p class="text-muted mb-2">Job search with company reviews and salary insights</p>
+                                    <span class="badge bg-secondary">Not Connected</span>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#connectAccountModal" >
+                                        <i class="bi bi-plus-circle me-1"></i>Connect Account
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-						<!-- Progress -->
-						<div class="mb-4">
-							<div class="progress" style="height: 6px;">
-								<div class="progress-bar bg-primary" role="progressbar" style="width: 65%;"></div>
-							</div>
-							<p class="text-center small text-muted mt-2">Step 2 of 3</p>
-						</div>
+                    <!-- ZipRecruiter -->
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-1 text-center">
+                                    <img src="https://ui-avatars.com/api/?name=ZipRecruiter&background=1472d9&color=fff&size=64" 
+                                         alt="ZipRecruiter" class="rounded" width="64" height="64">
+                                </div>
+                                <div class="col-md-7">
+                                    <h6 class="mb-1">ZipRecruiter</h6>
+                                    <p class="text-muted mb-2">Smart matching technology for job seekers</p>
+                                    <span class="badge bg-secondary">Not Connected</span>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#connectAccountModal" >
+                                        <i class="bi bi-plus-circle me-1"></i>Connect Account
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-						{#if message}
-						<div class="alert alert-{messageType} py-2">
-							{message}
-						</div>
-						{/if}
+                    <!-- Add More Sites -->
+                    <div class="card border-dashed">
+                        <div class="card-body text-center py-4">
+                            <i class="bi bi-plus-circle text-muted" style="font-size: 2rem;"></i>
+                            <h6 class="mt-3 text-muted">Need to connect another job site?</h6>
+                            <button class="btn btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#requestSiteModal">
+                                <i class="bi bi-plus-circle me-1"></i>Request New Site
+                            </button>
+                        </div>
+                    </div>
 
-						<div class="list-group">
+                    <!-- Security Notice -->
+                    <div class="card mt-4 border-info">
+                        <div class="card-body">
+                            <h6><i class="bi bi-shield-check text-info me-2"></i>Security & Privacy</h6>
+                            <ul class="mb-0 small">
+                                <li>All credentials are encrypted using bank-level AES-256 encryption</li>
+                                <li>Your agent can only access accounts for job application purposes</li>
+                                <li>You can disconnect any account at any time</li>
+                                <li>We never share your credentials with third parties</li>
+                                <li>Activity logs are available for your review</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
 
-							<button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-								<div class="d-flex align-items-center">
-									<img src="/assets/images/brands/linkedin.png" class="me-3" style="height:24px;" />
-									<span class="fw-semibold">Connect LinkedIn</span>
-								</div>
-								<span class="badge bg-primary rounded-pill">Connect</span>
-							</button>
-
-							<button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-								<div class="d-flex align-items-center">
-									<img src="/assets/images/brands/google.png" class="me-3" style="height:24px;" />
-									<span class="fw-semibold">Connect Gmail</span>
-								</div>
-								<span class="badge bg-primary rounded-pill">Connect</span>
-							</button>
-
-							<button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-								<div class="d-flex align-items-center">
-									<img src="/assets/images/brands/indeed.png" class="me-3" style="height:24px;" />
-									<span class="fw-semibold">Connect Indeed</span>
-								</div>
-								<span class="badge bg-primary rounded-pill">Connect</span>
-							</button>
-
-						</div>
-
-						<div class="alert alert-info mt-3 small">
-							You can skip this now and connect later from your profile settings.
-						</div>
-
-						<div class="d-grid mt-4">
-							<button class="btn btn-primary" on:click={completeStep} disabled={loading}>
-								{loading ? 'Saving...' : 'Continue'}
-							</button>
-						</div>
-
-					</div>
 				</div>
-
-			</div>
-		</div>
-	</div>
-</div>
+				</div>

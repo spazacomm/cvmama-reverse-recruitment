@@ -36,625 +36,335 @@
 
 
     <div class="row">
-        <div class="col-xl col-lg-4 col-md-6">
-            <div class="card">
-                <div
-                    class="card-body overflow-hidden position-relative"
-                >
-                    <iconify-icon
-                        icon="iconamoon:3d-duotone"
-                        class="fs-36 text-info"
-                    ></iconify-icon>
-                    <h3 class="mb-0 fw-bold mt-3 mb-1">
-                        $59.6k
-                    </h3>
-                    <p class="text-muted">Total Income</p>
-                    <span class="badge fs-12 badge-soft-success"
-                        ><i class="ti ti-arrow-badge-up"></i>
-                        8.72%</span
-                    >
-                    <i
-                        class="bx bx-doughnut-chart widget-icon"
-                    ></i>
-                </div>
-                <!-- end card-body -->
-            </div>
-            <!-- end card -->
-        </div>
-        <!-- end col -->
 
-        <div class="col-xl col-lg-4 col-md-6">
-            <div class="card">
-                <div
-                    class="card-body overflow-hidden position-relative"
-                >
-                    <iconify-icon
-                        icon="iconamoon:category-duotone"
-                        class="fs-36 text-success"
-                    ></iconify-icon>
-                    <h3 class="mb-0 fw-bold mt-3 mb-1">
-                        $24.03k
-                    </h3>
-                    <p class="text-muted">Total Expenses</p>
-                    <span class="badge fs-12 badge-soft-danger"
-                        ><i class="ti ti-arrow-badge-down"></i>
-                        3.28%</span
-                    >
-                    <i
-                        class="bx bx-bar-chart-alt-2 widget-icon"
-                    ></i>
-                </div>
-                <!-- end card-body -->
-            </div>
-            <!-- end card -->
-        </div>
-        <!-- end col -->
 
-        <div class="col-xl col-lg-4 col-md-6">
-            <div class="card">
-                <div
-                    class="card-body overflow-hidden position-relative"
-                >
-                    <iconify-icon
-                        icon="iconamoon:store-duotone"
-                        class="fs-36 text-purple"
-                    ></iconify-icon>
-                    <h3 class="mb-0 fw-bold mt-3 mb-1">
-                        $48.7k
-                    </h3>
-                    <p class="text-muted">Investments</p>
-                    <span class="badge fs-12 badge-soft-danger"
-                        ><i class="ti ti-arrow-badge-down"></i>
-                        5.69%</span
-                    >
-                    <i
-                        class="bx bx-building-house widget-icon"
-                    ></i>
+         <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 px-4 py-4">
+                <!-- Welcome Header -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2 class="mb-1">Welcome back, Sarah! 👋</h2>
+                        <p class="text-muted">Here's what's happening with your job search today.</p>
+                    </div>
                 </div>
-                <!-- end card-body -->
-            </div>
-            <!-- end card -->
-        </div>
-        <!-- end col -->
 
-        <div class="col-xl col-lg-6 col-md-6">
-            <div class="card">
-                <div
-                    class="card-body overflow-hidden position-relative"
-                >
-                    <iconify-icon
-                        icon="iconamoon:gift-duotone"
-                        class="fs-36 text-orange"
-                    ></iconify-icon>
-                    <h3 class="mb-0 fw-bold mt-3 mb-1">
-                        $11.3k
-                    </h3>
-                    <p class="text-muted">Savings</p>
-                    <span class="badge fs-12 badge-soft-success"
-                        ><i class="ti ti-arrow-badge-up"></i>
-                        10.58%</span
-                    >
-                    <i class="bx bx-bowl-hot widget-icon"></i>
+                <!-- Quick Stats -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="card stat-card">
+                            <div class="card-body">
+                                <h6 class="text-muted mb-2">Applications Sent</h6>
+                                <h3 class="mb-0">24</h3>
+                                <small class="text-success"><i class="bi bi-arrow-up"></i> +6 this week</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card stat-card" style="border-left-color: #10b981;">
+                            <div class="card-body">
+                                <h6 class="text-muted mb-2">Interviews</h6>
+                                <h3 class="mb-0">5</h3>
+                                <small class="text-success"><i class="bi bi-arrow-up"></i> +2 this week</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card stat-card" style="border-left-color: #f59e0b;">
+                            <div class="card-body">
+                                <h6 class="text-muted mb-2">Pending Responses</h6>
+                                <h3 class="mb-0">12</h3>
+                                <small class="text-muted">Awaiting reply</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card stat-card" style="border-left-color: #ef4444;">
+                            <div class="card-body">
+                                <h6 class="text-muted mb-2">Days Active</h6>
+                                <h3 class="mb-0">23</h3>
+                                <small class="text-muted">Since joining</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <!-- end card-body -->
-            </div>
-            <!-- end card -->
-        </div>
-        <!-- end col -->
 
-        <div class="col-xl col-lg-6 col-md-12">
-            <div class="card">
-                <div
-                    class="card-body overflow-hidden position-relative"
-                >
-                    <iconify-icon
-                        icon="iconamoon:certificate-badge-duotone"
-                        class="fs-36 text-warning"
-                    ></iconify-icon>
-                    <h3 class="mb-0 fw-bold mt-3 mb-1">
-                        $5.5k
-                    </h3>
-                    <p class="text-muted">Profits</p>
-                    <span class="badge fs-12 badge-soft-success"
-                        ><i class="ti ti-arrow-badge-up"></i>
-                        2.25%</span
-                    >
-                    <i
-                        class="bx bx-cricket-ball widget-icon"
-                    ></i>
+                <div class="row">
+                    <!-- Your Career Agent -->
+                    <div class="col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">
+                                    <i class="bi bi-person-badge text-primary me-2"></i>Your Career Agent
+                                </h5>
+                                <div class="text-center mb-3">
+                                    <img src="https://ui-avatars.com/api/?name=Michael+Chen&background=7c3aed&color=fff&size=80" 
+                                         alt="Agent" class="agent-avatar rounded-circle mb-3">
+                                    <h6 class="mb-1">Michael Chen</h6>
+                                    <p class="text-muted small mb-2">Tech Recruiter • 8 years exp.</p>
+                                    <span class="badge bg-success">Active</span>
+                                </div>
+                                <div class="mb-3">
+                                    <small class="text-muted d-block mb-1">Specializations:</small>
+                                    <span class="badge bg-light text-dark me-1">Software Engineering</span>
+                                    <span class="badge bg-light text-dark me-1">Product Management</span>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-primary btn-sm">
+                                        <i class="bi bi-chat-dots me-2"></i>Send Message
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm">
+                                        <i class="bi bi-person me-2"></i>View Full Profile
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subscription Status -->
+                    <div class="col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">
+                                    <i class="bi bi-credit-card text-primary me-2"></i>Subscription
+                                </h5>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="mb-0">Professional Plan</h6>
+                                        <span class="badge badge-plan">Active</span>
+                                    </div>
+                                    <h4 class="mb-0">$249<small class="text-muted">/month</small></h4>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <small class="text-muted">Agent Hours Used</small>
+                                        <small class="fw-bold">2.5 / 4 hrs</small>
+                                    </div>
+                                    <div class="progress progress-thin">
+                                        <div class="progress-bar bg-primary" style="width: 62.5%"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <small class="text-muted d-block">Next billing date:</small>
+                                    <strong>December 11, 2025</strong>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-gear me-2"></i>Manage Subscription
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm">
+                                        <i class="bi bi-arrow-up-circle me-2"></i>Upgrade Plan
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">
+                                    <i class="bi bi-lightning-charge text-primary me-2"></i>Quick Actions
+                                </h5>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-outline-primary">
+                                        <i class="bi bi-file-earmark-arrow-up me-2"></i>Upload Document
+                                    </button>
+                                    <button class="btn btn-outline-primary">
+                                        <i class="bi bi-pencil-square me-2"></i>Update Profile
+                                    </button>
+                                    <button class="btn btn-outline-primary">
+                                        <i class="bi bi-calendar-check me-2"></i>Schedule Call
+                                    </button>
+                                    <button class="btn btn-outline-primary">
+                                        <i class="bi bi-search me-2"></i>Browse Jobs
+                                    </button>
+                                </div>
+                                <div class="mt-4 p-3 bg-light rounded">
+                                    <h6 class="mb-2"><i class="bi bi-lightbulb text-warning me-2"></i>Tip of the Day</h6>
+                                    <p class="small mb-0 text-muted">Tailor your resume for each application. Highlight skills that match the job description to increase your chances of getting noticed.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <!-- end card-body -->
+
+                <!-- Recent Activity & Messages -->
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">
+                                    <i class="bi bi-clock-history text-primary me-2"></i>Recent Activity
+                                </h5>
+                                <div class="activity-item d-flex">
+                                    <div class="activity-icon bg-primary bg-opacity-10 text-primary me-3">
+                                        <i class="bi bi-file-earmark-text"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <p class="mb-1"><strong>Resume updated</strong></p>
+                                        <small class="text-muted">Michael reviewed your new resume</small>
+                                        <div><small class="text-muted">2 hours ago</small></div>
+                                    </div>
+                                </div>
+                                <div class="activity-item d-flex">
+                                    <div class="activity-icon bg-success bg-opacity-10 text-success me-3">
+                                        <i class="bi bi-send"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <p class="mb-1"><strong>Application sent</strong></p>
+                                        <small class="text-muted">Senior Product Manager at TechCorp</small>
+                                        <div><small class="text-muted">5 hours ago</small></div>
+                                    </div>
+                                </div>
+                                <div class="activity-item d-flex">
+                                    <div class="activity-icon bg-warning bg-opacity-10 text-warning me-3">
+                                        <i class="bi bi-calendar-event"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <p class="mb-1"><strong>Interview scheduled</strong></p>
+                                        <small class="text-muted">DataFlow Inc. - First round</small>
+                                        <div><small class="text-muted">Yesterday</small></div>
+                                    </div>
+                                </div>
+                                <div class="activity-item d-flex">
+                                    <div class="activity-icon bg-info bg-opacity-10 text-info me-3">
+                                        <i class="bi bi-chat-dots"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <p class="mb-1"><strong>New message</strong></p>
+                                        <small class="text-muted">Michael sent you interview prep materials</small>
+                                        <div><small class="text-muted">2 days ago</small></div>
+                                    </div>
+                                </div>
+                                <div class="text-center mt-3">
+                                    <a href="#" class="text-decoration-none">View all activity <i class="bi bi-arrow-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">
+                                    <i class="bi bi-chat-dots text-primary me-2"></i>Recent Messages
+                                    <span class="badge bg-danger ms-2">3</span>
+                                </h5>
+                                <div class="activity-item d-flex align-items-start">
+                                    <img src="https://ui-avatars.com/api/?name=Michael+Chen&background=7c3aed&color=fff&size=40" 
+                                         alt="Michael" class="rounded-circle me-3" width="40" height="40">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <strong>Michael Chen</strong>
+                                            <small class="text-muted">10:30 AM</small>
+                                        </div>
+                                        <p class="mb-0 text-muted small">Great news! I found a perfect match for your profile. Let's discuss the Senior PM role at...</p>
+                                        <span class="badge bg-danger badge-sm mt-1">New</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item d-flex align-items-start">
+                                    <img src="https://ui-avatars.com/api/?name=Michael+Chen&background=7c3aed&color=fff&size=40" 
+                                         alt="Michael" class="rounded-circle me-3" width="40" height="40">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <strong>Michael Chen</strong>
+                                            <small class="text-muted">Yesterday</small>
+                                        </div>
+                                        <p class="mb-0 text-muted small">I've reviewed your updated resume. Here are a few suggestions to make it even stronger...</p>
+                                    </div>
+                                </div>
+                                <div class="activity-item d-flex align-items-start">
+                                    <img src="https://ui-avatars.com/api/?name=Michael+Chen&background=7c3aed&color=fff&size=40" 
+                                         alt="Michael" class="rounded-circle me-3" width="40" height="40">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <strong>Michael Chen</strong>
+                                            <small class="text-muted">Nov 9</small>
+                                        </div>
+                                        <p class="mb-0 text-muted small">How did the interview with DataFlow go? Let me know if you need any follow-up support.</p>
+                                    </div>
+                                </div>
+                                <div class="d-grid mt-3">
+                                    <button class="btn btn-primary">
+                                        <i class="bi bi-chat-left-text me-2"></i>Open Messages
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documents Section -->
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="card-title mb-0">
+                                        <i class="bi bi-file-earmark-text text-primary me-2"></i>Your Documents
+                                    </h5>
+                                    <button class="btn btn-sm btn-primary">
+                                        <i class="bi bi-plus-circle me-1"></i>Upload New
+                                    </button>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Document Name</th>
+                                                <th>Type</th>
+                                                <th>Last Modified</th>
+                                                <th>Shared</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><i class="bi bi-file-pdf text-danger me-2"></i>Resume_SarahJohnson_2025.pdf</td>
+                                                <td><span class="badge bg-primary">Resume</span></td>
+                                                <td>Nov 10, 2025</td>
+                                                <td><i class="bi bi-check-circle-fill text-success"></i> With agent</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-download"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><i class="bi bi-file-word text-primary me-2"></i>CoverLetter_TechCorp.docx</td>
+                                                <td><span class="badge bg-info">Cover Letter</span></td>
+                                                <td>Nov 9, 2025</td>
+                                                <td><i class="bi bi-check-circle-fill text-success"></i> With agent</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-download"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><i class="bi bi-file-pdf text-danger me-2"></i>Portfolio_Projects.pdf</td>
+                                                <td><span class="badge bg-success">Portfolio</span></td>
+                                                <td>Nov 5, 2025</td>
+                                                <td><i class="bi bi-check-circle-fill text-success"></i> With agent</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-download"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <!-- end card -->
-        </div>
-        <!-- end col -->
+        
+    
+       
     </div>
     <!-- end row-->
 
-    <div class="row">
-        <div class="col-xl-6">
-            <div class="card">
-                <div class="card-body p-0">
-                    <div class="pt-3 px-3">
-                        <div class="float-end">
-                            <a
-                                href="javascript:void(0);"
-                                class="text-primary"
-                                >Export
-                                <i
-                                    class="bx bx-export ms-1"
-                                ></i>
-                            </a>
-                        </div>
-                        <h5 class="card-title mb-3">
-                            Recent Project Summary
-                        </h5>
-                    </div>
-                    <div
-                        class="mb-3"
-                        data-simplebar
-                        style="max-height: 324px"
-                    >
-                        <div
-                            class="table-responsive table-centered table-nowrap px-3"
-                        >
-                            <table
-                                class="table table-hover mb-0"
-                            >
-                                <thead>
-                                    <tr>
-                                        <th>Project</th>
-                                        <th>Client</th>
-                                        <th>Team</th>
-                                        <th>Deadline</th>
-                                        <th>Work Progress</th>
-                                    </tr>
-                                </thead>
-                                <!-- end thead -->
-                                <tbody>
-                                    <tr>
-                                        <td>Zelogy</td>
-                                        <td>Daniel Olsen</td>
-                                        <td
-                                            class="avatar-group"
-                                        >
-                                            <a
-                                                href="javascript:void(0);"
-                                                class="avatar-group-item"
-                                            >
-                                                <img
-                                                    src="assets/images/users/avatar-2.jpg"
-                                                    alt="avatar-2"
-                                                    class="img-fluid avatar-xs rounded-circle avatar-border"
-                                                />
-                                            </a>
-                                            <a
-                                                href="javascript:void(0);"
-                                                class="avatar-group-item"
-                                            >
-                                                <img
-                                                    src="assets/images/users/avatar-3.jpg"
-                                                    alt="avatar-3"
-                                                    class="img-fluid avatar-xs rounded-circle avatar-border"
-                                                />
-                                            </a>
-                                            <a
-                                                href="javascript:void(0);"
-                                                class="avatar-group-item"
-                                            >
-                                                <img
-                                                    src="assets/images/users/avatar-4.jpg"
-                                                    alt="avatar-4"
-                                                    class="img-fluid avatar-xs rounded-circle avatar-border"
-                                                />
-                                            </a>
-                                        </td>
-                                        <td>12 April 2024</td>
-                                        <td>
-                                            <div
-                                                class="progress progress-sm"
-                                            >
-                                                <div
-                                                    class="progress-bar"
-                                                    role="progressbar"
-                                                    style="
-                                                        width: 33%;
-                                                    "
-                                                    aria-valuenow="33"
-                                                    aria-valuemin="0"
-                                                    aria-valuemax="100"
-                                                ></div>
-                                            </div>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>Shiaz</td>
-                                        <td>Jack Roldan</td>
-                                        <td
-                                            class="avatar-group"
-                                        >
-                                            <a
-                                                href="javascript:void(0);"
-                                                class="avatar-group-item"
-                                            >
-                                                <img
-                                                    src="assets/images/users/avatar-1.jpg"
-                                                    alt="avatar-1"
-                                                    class="img-fluid avatar-xs rounded-circle avatar-border"
-                                                />
-                                            </a>
-                                            <a
-                                                href="javascript:void(0);"
-                                                class="avatar-group-item"
-                                            >
-                                                <img
-                                                    src="assets/images/users/avatar-5.jpg"
-                                                    alt="avatar-5"
-                                                    class="img-fluid avatar-xs rounded-circle avatar-border"
-                                                />
-                                            </a>
-                                        </td>
-                                        <td>10 April 2024</td>
-                                        <td>
-                                            <div
-                                                class="progress progress-sm"
-                                            >
-                                                <div
-                                                    class="progress-bar bg-success"
-                                                    role="progressbar"
-                                                    style="
-                                                        width: 74%;
-                                                    "
-                                                    aria-valuenow="74"
-                                                    aria-valuemin="0"
-                                                    aria-valuemax="100"
-                                                ></div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Holderick</td>
-                                        <td>Betty Cox</td>
-                                        <td
-                                            class="avatar-group"
-                                        >
-                                            <a
-                                                href="javascript:void(0);"
-                                                class="avatar-group-item"
-                                            >
-                                                <img
-                                                    src="assets/images/users/avatar-5.jpg"
-                                                    alt="avatar-5"
-                                                    class="img-fluid avatar-xs rounded-circle avatar-border"
-                                                />
-                                            </a>
-                                            <a
-                                                href="javascript:void(0);"
-                                                class="avatar-group-item"
-                                            >
-                                                <img
-                                                    src="assets/images/users/avatar-2.jpg"
-                                                    alt="avatar-2"
-                                                    class="img-fluid avatar-xs rounded-circle avatar-border"
-                                                />
-                                            </a>
-                                            <a
-                                                href="javascript:void(0);"
-                                                class="avatar-group-item"
-                                            >
-                                                <img
-                                                    src="assets/images/users/avatar-3.jpg"
-                                                    alt="avatar-3"
-                                                    class="img-fluid avatar-xs rounded-circle avatar-border"
-                                                />
-                                            </a>
-                                        </td>
-                                        <td>31 March 2024</td>
-                                        <td>
-                                            <div
-                                                class="progress progress-sm"
-                                            >
-                                                <div
-                                                    class="progress-bar bg-warning"
-                                                    role="progressbar"
-                                                    style="
-                                                        width: 50%;
-                                                    "
-                                                    aria-valuenow="50"
-                                                    aria-valuemin="0"
-                                                    aria-valuemax="100"
-                                                ></div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Feyvux</td>
-                                        <td>Carlos Johnson</td>
-                                        <td
-                                            class="avatar-group"
-                                        >
-                                            <a
-                                                href="javascript:void(0);"
-                                                class="avatar-group-item"
-                                            >
-                                                <img
-                                                    src="assets/images/users/avatar-3.jpg"
-                                                    alt="avatar-3"
-                                                    class="img-fluid avatar-xs rounded-circle avatar-border"
-                                                />
-                                            </a>
-                                            <a
-                                                href="javascript:void(0);"
-                                                class="avatar-group-item"
-                                            >
-                                                <img
-                                                    src="assets/images/users/avatar-7.jpg"
-                                                    alt="avatar-7"
-                                                    class="img-fluid avatar-xs rounded-circle avatar-border"
-                                                />
-                                            </a>
-                                            <a
-                                                href="javascript:void(0);"
-                                                class="avatar-group-item"
-                                            >
-                                                <img
-                                                    src="assets/images/users/avatar-6.jpg"
-                                                    alt="avatar-6"
-                                                    class="img-fluid avatar-xs rounded-circle avatar-border"
-                                                />
-                                            </a>
-                                        </td>
-                                        <td>25 March 2024</td>
-                                        <td>
-                                            <div
-                                                class="progress progress-sm"
-                                            >
-                                                <div
-                                                    class="progress-bar"
-                                                    role="progressbar"
-                                                    style="
-                                                        width: 92%;
-                                                    "
-                                                    aria-valuenow="92"
-                                                    aria-valuemin="0"
-                                                    aria-valuemax="100"
-                                                ></div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Xavlox</td>
-                                        <td>Lorraine Cox</td>
-                                        <td
-                                            class="avatar-group"
-                                        >
-                                            <a
-                                                href="javascript:void(0);"
-                                                class="avatar-group-item"
-                                            >
-                                                <img
-                                                    src="assets/images/users/avatar-7.jpg"
-                                                    alt="avatar-7"
-                                                    class="img-fluid avatar-xs rounded-circle avatar-border"
-                                                />
-                                            </a>
-                                        </td>
-                                        <td>22 March 2024</td>
-                                        <td>
-                                            <div
-                                                class="progress progress-sm"
-                                            >
-                                                <div
-                                                    class="progress-bar bg-danger"
-                                                    role="progressbar"
-                                                    style="
-                                                        width: 48%;
-                                                    "
-                                                    aria-valuenow="48"
-                                                    aria-valuemin="0"
-                                                    aria-valuemax="100"
-                                                ></div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Mozacav</td>
-                                        <td>Delores Young</td>
-                                        <td
-                                            class="avatar-group"
-                                        >
-                                            <a
-                                                href="javascript:void(0);"
-                                                class="avatar-group-item"
-                                            >
-                                                <img
-                                                    src="assets/images/users/avatar-3.jpg"
-                                                    alt="avatar-3"
-                                                    class="img-fluid avatar-xs rounded-circle avatar-border"
-                                                />
-                                            </a>
-                                            <a
-                                                href="javascript:void(0);"
-                                                class="avatar-group-item"
-                                            >
-                                                <img
-                                                    src="assets/images/users/avatar-4.jpg"
-                                                    alt="avatar-4"
-                                                    class="img-fluid avatar-xs rounded-circle avatar-border"
-                                                />
-                                            </a>
-                                            <a
-                                                href="javascript:void(0);"
-                                                class="avatar-group-item"
-                                            >
-                                                <img
-                                                    src="assets/images/users/avatar-2.jpg"
-                                                    alt="avatar-2"
-                                                    class="img-fluid avatar-xs rounded-circle avatar-border"
-                                                />
-                                            </a>
-                                        </td>
-                                        <td>15 March 2024</td>
-                                        <td>
-                                            <div
-                                                class="progress progress-sm"
-                                            >
-                                                <div
-                                                    class="progress-bar bg-blue"
-                                                    role="progressbar"
-                                                    style="
-                                                        width: 21%;
-                                                    "
-                                                    aria-valuenow="21"
-                                                    aria-valuemin="0"
-                                                    aria-valuemax="100"
-                                                ></div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <!-- end tbody -->
-                            </table>
-                            <!-- end table -->
-                        </div>
-                        <!-- end table responsive -->
-                    </div>
-                </div>
-                <!-- end card body -->
-            </div>
-            <!-- end card -->
-        </div>
-        <!-- end col -->
-        <div class="col-xl-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="dropdown float-end">
-                        <a
-                            href="javascript:void(0);"
-                            class="dropdown-toggle arrow-none"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                        >
-                            <i
-                                class="bx bx-dots-vertical-rounded fs-18 text-dark"
-                            ></i>
-                        </a>
-                        <div
-                            class="dropdown-menu dropdown-menu-end"
-                        >
-                            <a
-                                href="javascript:void(0);"
-                                class="dropdown-item"
-                            >
-                                <i
-                                    class="bx bx-list-ul me-2"
-                                ></i
-                                >To Do
-                            </a>
-                            <a
-                                href="javascript:void(0);"
-                                class="dropdown-item"
-                            >
-                                <i
-                                    class="bx bx-line-chart me-2"
-                                ></i
-                                >In Progress
-                            </a>
-                            <a
-                                href="javascript:void(0);"
-                                class="dropdown-item"
-                            >
-                                <i
-                                    class="bx bx-check-square me-2"
-                                ></i
-                                >Completed
-                            </a>
-                        </div>
-                    </div>
-                    <h5 class="card-title mb-3">
-                        Today's Schedules
-                    </h5>
-                    <div class="row align-items-center">
-                        <div class="col-3 col-sm-2">
-                            <p>09:00</p>
-                        </div>
-                        <div class="col-9 col-sm-10">
-                            <div
-                                class="alert alert-primary px-2"
-                                role="alert"
-                            >
-                                <p class="mb-0">
-                                    Setup Github Repository
-                                </p>
-                                <p class="mb-0">
-                                    09:00 - 10:00
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row align-items-center">
-                        <div class="col-3 col-sm-2">
-                            <p>10:00</p>
-                        </div>
-                        <div class="col-9 col-sm-10">
-                            <div
-                                class="alert alert-success px-2"
-                                role="alert"
-                            >
-                                <p class="mb-0">
-                                    Design Review - Reback Admin
-                                </p>
-                                <p class="mb-0">
-                                    10:00 - 10:30
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row align-items-center">
-                        <div class="col-3 col-sm-2">
-                            <p>11:00</p>
-                        </div>
-                        <div class="col-9 col-sm-10">
-                            <div
-                                class="alert alert-info px-2"
-                                role="alert"
-                            >
-                                <p class="mb-0">
-                                    Meeting with BD Team
-                                </p>
-                                <p class="mb-0">
-                                    11:00 - 12:30
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row align-items-center">
-                        <div class="col-3 col-sm-2">
-                            <p class="mb-0">01:00</p>
-                        </div>
-                        <div class="col-9 col-sm-10">
-                            <div
-                                class="alert alert-warning px-2 mb-0"
-                                role="alert"
-                            >
-                                <p class="mb-0">
-                                    Meeting with Design Studio
-                                </p>
-                                <p class="mb-0">
-                                    01:00 - 02:00
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- end card body -->
-            </div>
-            <!-- end card -->
-        </div>
-        <!-- end col -->
-    </div>
-    <!-- end row -->
+   
 
 
 </div>
