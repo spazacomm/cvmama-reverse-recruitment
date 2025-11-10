@@ -6,13 +6,6 @@
 	let messageType = 'success';
 	let loading = false;
 
-	const {
-			data: { session }
-		} = await supabase.auth.getSession();
-
-		if (!session) {
-			goto('/login');
-		}
 
 	async function completeStep() {
 		loading = true;
