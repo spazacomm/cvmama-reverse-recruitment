@@ -45,7 +45,7 @@
 		if (role === 'candidate') {
 			const { data: candidate, error: candidateError } = await supabase
 				.from('candidates')
-				.select('first_name, last_name, onboarding_status')
+				.select('*')
 				.eq('user_id', authUser.id)
 				.single();
 
@@ -75,7 +75,7 @@
 				goto('/dashboard/agent');
 			} else {
 				// Candidate routing logic based on onboarding status
-				if (profile.onboarding_status !== 'completed') {
+				if (!profile.onboarding_completed ) {
 					goto('/candidate/onboarding');
 				} else {
 					goto('/candidate/dashboard');
@@ -89,7 +89,7 @@
 
 
   
-  <div class="account-pages pt-2 pt-sm-5 pb-4 pb-sm-5">
+  <div class="account-pages pt-2 pt-sm-5 pb-4 pb-sm-5 ">
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-xl-5">

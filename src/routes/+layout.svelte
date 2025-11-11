@@ -29,7 +29,7 @@
 			.single();
 
 		if (!profile) {
-			alert('Profile not found');
+			console.log('Profile not found');
 			goto('/login');
 			return;
 		}
@@ -39,7 +39,7 @@
 		// Redirect based on role
 		if (profile.role === 'admin') goto('/dashboard/admin');
 		else if (profile.role === 'agent') goto('/dashboard/agent');
-		else goto('/dashboard/candidate');
+		else goto('/candidate/dashboard');
 	});
 </script>
 

@@ -1,177 +1,435 @@
- <div class="container-xxl">
+<script>
+    import { onMount } from 'svelte';
+    import { goto } from '$app/navigation';
+    import { page } from '$app/stores';
+    
+    // Assuming you have a supabase client setup
+     import { supabase } from '$lib/supabaseClient';
+    
+    let loading = true;
+    let dashboardData = null;
+    let jobs = [];
+    let filteredJobs = [];
+    let activeTab = 'all';
+    
+    // Filter states
+    let searchQuery = '';
+    let statusFilter = 'all';
+    let dateFilter = 'last_30_days';
+    let sortBy = 'most_recent';
+    
+    // Pagination
+    let currentPage = 1;
+    let itemsPerPage = 10;
+    let totalPages = 1;
+    let onboarding_completed = false;
 
+    onMount(async () => {
+        await checkOnboardingStatus();
+        await loadData();
+    });
+
+    async function checkOnboardingStatus(){
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError) throw userError;
+
+         // Check if onboarding is completed
+         const { data: candidate, error: candidateError } = await supabase
+                .from('candidates')
+                .select('onboarding_completed')
+                .eq('user_id', user.id)
+                .single();
+            
+            if (candidateError) throw candidateError;
+            
+            onboarding_completed = candidate.onboarding_completed;
+    }
+    
+    async function loadData() {
+        loading = true;
+        try {
+            // Get user session
+            const { data: { user }, error: userError } = await supabase.auth.getUser();
+            if (userError) throw userError;
+            
+            // Load dashboard data (includes onboarding status)
+            const { data: dashboard, error: dashError } = await supabase
+                .from('candidate_dashboard_view')
+                .select('*')
+                .eq('user_id', user.id)
+                .single();
+            
+            if (dashError) throw dashError;
+            dashboardData = dashboard;
+            
+           
+            
+            // Load jobs
+            await loadJobs();
+            
+        } catch (error) {
+            console.error('Error loading data:', error);
+        } finally {
+            loading = false;
+        }
+    }
+    
+    async function loadJobs() {
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            
+            // Get candidate_id
+            const { data: candidate } = await supabase
+                .from('candidates')
+                .select('id')
+                .eq('user_id', user.id)
+                .single();
+            
+            // Load all jobs for the candidate
+            const { data, error } = await supabase
+                .from('jobs')
+                .select('*')
+                .eq('candidate_id', candidate.id)
+                .order('updated_at', { ascending: false });
+            
+            if (error) throw error;
+            jobs = data || [];
+            applyFilters();
+            
+        } catch (error) {
+            console.error('Error loading jobs:', error);
+        }
+    }
+    
+    function applyFilters() {
+        let filtered = [...jobs];
+        
+        // Search filter
+        if (searchQuery) {
+            filtered = filtered.filter(job => 
+                job.company_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                job.job_title.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        }
+        
+        // Status filter
+        if (statusFilter !== 'all') {
+            filtered = filtered.filter(job => job.status === statusFilter);
+        }
+        
+        // Tab filter
+        if (activeTab !== 'all') {
+            filtered = filtered.filter(job => job.status === activeTab);
+        }
+        
+        // Date filter
+        const now = new Date();
+        if (dateFilter !== 'all_time') {
+            filtered = filtered.filter(job => {
+                const jobDate = new Date(job.created_at);
+                const daysDiff = (now - jobDate) / (1000 * 60 * 60 * 24);
+                
+                switch(dateFilter) {
+                    case 'last_7_days': return daysDiff <= 7;
+                    case 'last_30_days': return daysDiff <= 30;
+                    case 'last_3_months': return daysDiff <= 90;
+                    default: return true;
+                }
+            });
+        }
+        
+        // Sort
+        switch(sortBy) {
+            case 'most_recent':
+                filtered.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+                break;
+            case 'company':
+                filtered.sort((a, b) => a.company_name.localeCompare(b.company_name));
+                break;
+            case 'status':
+                filtered.sort((a, b) => a.status.localeCompare(b.status));
+                break;
+            case 'salary':
+                filtered.sort((a, b) => (b.salary_max || 0) - (a.salary_max || 0));
+                break;
+        }
+        
+        filteredJobs = filtered;
+        totalPages = Math.ceil(filtered.length / itemsPerPage);
+    }
+    
+    function resetFilters() {
+        searchQuery = '';
+        statusFilter = 'all';
+        dateFilter = 'last_30_days';
+        sortBy = 'most_recent';
+        applyFilters();
+    }
+    
+    function switchTab(tab) {
+        activeTab = tab;
+        currentPage = 1;
+        applyFilters();
+    }
+    
+    function getJobsByStatus(status) {
+        return jobs.filter(job => job.status === status);
+    }
+    
+    function formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+    
+    function formatSalary(min, max, currency = 'USD') {
+        if (!min && !max) return 'Not specified';
+        if (min && max) return `$${(min/1000)}k-$${(max/1000)}k`;
+        if (min) return `$${(min/1000)}k+`;
+        return `Up to $${(max/1000)}k`;
+    }
+    
+    function getStatusBadgeClass(status) {
+        const classes = {
+            'saved': 'bg-warning text-dark',
+            'delegated': 'bg-primary',
+            'applied': 'bg-success',
+            'interviewing': 'text-white',
+            'offered': 'bg-info',
+            'rejected': 'bg-danger',
+            'accepted': 'bg-success',
+            'withdrawn': 'bg-secondary'
+        };
+        return classes[status] || 'bg-secondary';
+    }
+    
+    function getCompanyInitials(company) {
+        return company.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
+    }
+    
+    function getAvatarColor(company) {
+        const colors = ['4f46e5', '10b981', '635bff', 'ff5a5f', '3b82f6', 'f59e0b'];
+        const index = company.length % colors.length;
+        return colors[index];
+    }
+    
+    $: paginatedJobs = filteredJobs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    $: {
+        // Re-apply filters when any filter changes
+        searchQuery, statusFilter, dateFilter, sortBy;
+        applyFilters();
+    }
+</script>
+
+<div class="container-xxl">
     <div class="col-md-9 col-lg-10 px-4 py-4">
+        {#if !onboarding_completed}
+        <div class="text-center py-5">
+            <i class="bi bi-person-check" style="font-size: 4rem; color: #ccc;"></i>
+            <h4 class="mt-3">Onboarding Incomplete</h4>
+            <p class="text-muted mb-4">
+                Your profile is not fully set up yet. Complete your onboarding to unlock personalized job recommendations.
+            </p>
+            <a href="/candidate/onboarding" class="btn btn-primary">
+                Complete Onboarding
+            </a>
+        </div>
+        
+        {:else}
+            <div id="jobs-page" class="page-section">
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h2 class="mb-1">Job Applications</h2>
+                                <p class="text-muted">Track and manage your job applications</p>
+                            </div>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addJobModal">
+                                <i class="bi bi-plus-circle me-2"></i>Add Job Manually
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-                <div id="jobs-page" class="page-section">
-                    <div class="row mb-3">
-                        <div class="col-12">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h2 class="mb-1">Job Applications</h2>
-                                    <p class="text-muted">Track and manage your job applications</p>
+                <!-- Stats Overview -->
+                <div class="row mb-4">
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="card stat-card">
+                            <div class="card-body text-center">
+                                <i class="bi bi-bookmark-fill text-warning" style="font-size: 2rem;"></i>
+                                <h3 class="mt-2 mb-0">{dashboardData?.saved_jobs || 0}</h3>
+                                <p class="text-muted mb-0">Saved</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="card stat-card" style="border-left-color: #3b82f6;">
+                            <div class="card-body text-center">
+                                <i class="bi bi-send-fill text-primary" style="font-size: 2rem;"></i>
+                                <h3 class="mt-2 mb-0">{dashboardData?.delegated_jobs || 0}</h3>
+                                <p class="text-muted mb-0">Delegated</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="card stat-card" style="border-left-color: #10b981;">
+                            <div class="card-body text-center">
+                                <i class="bi bi-check-circle-fill text-success" style="font-size: 2rem;"></i>
+                                <h3 class="mt-2 mb-0">{dashboardData?.applied_jobs || 0}</h3>
+                                <p class="text-muted mb-0">Applied</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="card stat-card" style="border-left-color: #8b5cf6;">
+                            <div class="card-body text-center">
+                                <i class="bi bi-people-fill text-purple" style="font-size: 2rem; color: #8b5cf6;"></i>
+                                <h3 class="mt-2 mb-0">{dashboardData?.interviewing_jobs || 0}</h3>
+                                <p class="text-muted mb-0">Interviewing</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters and Search -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row align-items-end">
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <label class="form-label">Search</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                    <input type="text" class="form-control" placeholder="Search by company or role..." bind:value={searchQuery}>
                                 </div>
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addJobModal">
-                                    <i class="bi bi-plus-circle me-2"></i>Add Job Manually
+                            </div>
+                            <div class="col-md-2 mb-3 mb-md-0">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" bind:value={statusFilter}>
+                                    <option value="all">All Statuses</option>
+                                    <option value="saved">Saved</option>
+                                    <option value="delegated">Delegated</option>
+                                    <option value="applied">Applied</option>
+                                    <option value="interviewing">Interviewing</option>
+                                    <option value="offered">Offer</option>
+                                    <option value="rejected">Rejected</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 mb-3 mb-md-0">
+                                <label class="form-label">Date Range</label>
+                                <select class="form-select" bind:value={dateFilter}>
+                                    <option value="last_7_days">Last 7 days</option>
+                                    <option value="last_30_days">Last 30 days</option>
+                                    <option value="last_3_months">Last 3 months</option>
+                                    <option value="all_time">All time</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 mb-3 mb-md-0">
+                                <label class="form-label">Sort By</label>
+                                <select class="form-select" bind:value={sortBy}>
+                                    <option value="most_recent">Most Recent</option>
+                                    <option value="company">Company (A-Z)</option>
+                                    <option value="status">Status</option>
+                                    <option value="salary">Salary (High-Low)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-outline-secondary w-100" on:click={resetFilters}>
+                                    <i class="bi bi-arrow-clockwise me-1"></i>Reset
                                 </button>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Stats Overview -->
-                    <div class="row mb-4">
-                        <div class="col-md-3 col-6 mb-3">
-                            <div class="card stat-card">
-                                <div class="card-body text-center">
-                                    <i class="bi bi-bookmark-fill text-warning" style="font-size: 2rem;"></i>
-                                    <h3 class="mt-2 mb-0">8</h3>
-                                    <p class="text-muted mb-0">Saved</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-6 mb-3">
-                            <div class="card stat-card" style="border-left-color: #3b82f6;">
-                                <div class="card-body text-center">
-                                    <i class="bi bi-send-fill text-primary" style="font-size: 2rem;"></i>
-                                    <h3 class="mt-2 mb-0">12</h3>
-                                    <p class="text-muted mb-0">Delegated</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-6 mb-3">
-                            <div class="card stat-card" style="border-left-color: #10b981;">
-                                <div class="card-body text-center">
-                                    <i class="bi bi-check-circle-fill text-success" style="font-size: 2rem;"></i>
-                                    <h3 class="mt-2 mb-0">24</h3>
-                                    <p class="text-muted mb-0">Applied</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-6 mb-3">
-                            <div class="card stat-card" style="border-left-color: #8b5cf6;">
-                                <div class="card-body text-center">
-                                    <i class="bi bi-people-fill text-purple" style="font-size: 2rem; color: #8b5cf6;"></i>
-                                    <h3 class="mt-2 mb-0">5</h3>
-                                    <p class="text-muted mb-0">Interviewing</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Job Tabs -->
+                <ul class="nav nav-tabs mb-4" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" class:active={activeTab === 'all'} on:click={() => switchTab('all')}>
+                            All Jobs <span class="badge bg-secondary ms-2">{jobs.length}</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" class:active={activeTab === 'saved'} on:click={() => switchTab('saved')}>
+                            <i class="bi bi-bookmark-fill text-warning me-1"></i>Saved 
+                            <span class="badge bg-secondary ms-2">{getJobsByStatus('saved').length}</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" class:active={activeTab === 'delegated'} on:click={() => switchTab('delegated')}>
+                            <i class="bi bi-send-fill text-primary me-1"></i>Delegated 
+                            <span class="badge bg-secondary ms-2">{getJobsByStatus('delegated').length}</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" class:active={activeTab === 'applied'} on:click={() => switchTab('applied')}>
+                            <i class="bi bi-check-circle-fill text-success me-1"></i>Applied 
+                            <span class="badge bg-secondary ms-2">{getJobsByStatus('applied').length}</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" class:active={activeTab === 'interviewing'} on:click={() => switchTab('interviewing')}>
+                            <i class="bi bi-people-fill me-1" style="color: #8b5cf6;"></i>Interviewing 
+                            <span class="badge bg-secondary ms-2">{getJobsByStatus('interviewing').length}</span>
+                        </button>
+                    </li>
+                </ul>
 
-                    <!-- Filters and Search -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <div class="row align-items-end">
-                                <div class="col-md-4 mb-3 mb-md-0">
-                                    <label class="form-label">Search</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                        <input type="text" class="form-control" placeholder="Search by company or role...">
-                                    </div>
-                                </div>
-                                <div class="col-md-2 mb-3 mb-md-0">
-                                    <label class="form-label">Status</label>
-                                    <select class="form-select">
-                                        <option selected>All Statuses</option>
-                                        <option>Saved</option>
-                                        <option>Delegated</option>
-                                        <option>Applied</option>
-                                        <option>Interviewing</option>
-                                        <option>Offer</option>
-                                        <option>Rejected</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2 mb-3 mb-md-0">
-                                    <label class="form-label">Date Range</label>
-                                    <select class="form-select">
-                                        <option selected>Last 30 days</option>
-                                        <option>Last 7 days</option>
-                                        <option>Last 3 months</option>
-                                        <option>All time</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2 mb-3 mb-md-0">
-                                    <label class="form-label">Sort By</label>
-                                    <select class="form-select">
-                                        <option selected>Most Recent</option>
-                                        <option>Company (A-Z)</option>
-                                        <option>Status</option>
-                                        <option>Salary (High-Low)</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <button class="btn btn-outline-secondary w-100">
-                                        <i class="bi bi-arrow-clockwise me-1"></i>Reset
-                                    </button>
-                                </div>
-                            </div>
+                <!-- Jobs List -->
+                <div class="tab-content">
+                    {#if paginatedJobs.length === 0}
+                        <div class="text-center py-5">
+                            <i class="bi bi-inbox" style="font-size: 4rem; color: #ccc;"></i>
+                            <h4 class="mt-3">No jobs found</h4>
+                            <p class="text-muted">Try adjusting your filters or add a new job</p>
                         </div>
-                    </div>
-
-                    <!-- Job Tabs -->
-                    <ul class="nav nav-tabs mb-4" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#all-jobs">
-                                All Jobs <span class="badge bg-secondary ms-2">49</span>
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#saved-jobs">
-                                <i class="bi bi-bookmark-fill text-warning me-1"></i>Saved <span class="badge bg-secondary ms-2">8</span>
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#delegated-jobs">
-                                <i class="bi bi-send-fill text-primary me-1"></i>Delegated <span class="badge bg-secondary ms-2">12</span>
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#applied-jobs">
-                                <i class="bi bi-check-circle-fill text-success me-1"></i>Applied <span class="badge bg-secondary ms-2">24</span>
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#interviewing-jobs">
-                                <i class="bi bi-people-fill me-1" style="color: #8b5cf6;"></i>Interviewing <span class="badge bg-secondary ms-2">5</span>
-                            </button>
-                        </li>
-                    </ul>
-
-                    <!-- Jobs List -->
-                    <div class="tab-content">
-                        <!-- All Jobs Tab -->
-                        <div class="tab-pane fade show active" id="all-jobs">
-                            <!-- Job Card 1 - Interviewing -->
+                    {:else}
+                        {#each paginatedJobs as job (job.id)}
                             <div class="card mb-3">
                                 <div class="card-body">
                                     <div class="row align-items-start">
                                         <div class="col-md-1 text-center mb-3 mb-md-0">
-                                            <img src="https://ui-avatars.com/api/?name=TechCorp&background=4f46e5&color=fff&size=64" 
-                                                 alt="TechCorp" class="rounded" width="64" height="64">
+                                            <img src="https://ui-avatars.com/api/?name={getCompanyInitials(job.company_name)}&background={getAvatarColor(job.company_name)}&color=fff&size=64" 
+                                                 alt={job.company_name} class="rounded" width="64" height="64">
                                         </div>
                                         <div class="col-md-7">
                                             <div class="d-flex align-items-start mb-2">
                                                 <div class="flex-grow-1">
-                                                    <h5 class="mb-1">Senior Product Manager</h5>
+                                                    <h5 class="mb-1">{job.job_title}</h5>
                                                     <p class="text-muted mb-2">
-                                                        <strong>TechCorp Inc.</strong> • San Francisco, CA (Remote)
+                                                        <strong>{job.company_name}</strong> 
+                                                        {#if job.location}• {job.location}{/if}
+                                                        {#if job.work_mode}({job.work_mode}){/if}
                                                     </p>
                                                 </div>
-                                                <button class="btn btn-sm btn-link text-warning">
-                                                    <i class="bi bi-bookmark-fill"></i>
-                                                </button>
                                             </div>
                                             <div class="mb-2">
-                                                <span class="badge bg-success me-2">$140k-$170k</span>
-                                                <span class="badge bg-light text-dark me-2">Full-time</span>
-                                                <span class="badge bg-light text-dark">Remote</span>
+                                                {#if job.salary_min || job.salary_max}
+                                                    <span class="badge bg-success me-2">{formatSalary(job.salary_min, job.salary_max, job.salary_currency)}</span>
+                                                {/if}
+                                                {#if job.employment_type}
+                                                    <span class="badge bg-light text-dark me-2">{job.employment_type}</span>
+                                                {/if}
+                                                {#if job.work_mode}
+                                                    <span class="badge bg-light text-dark">{job.work_mode}</span>
+                                                {/if}
                                             </div>
                                             <p class="mb-2 small text-muted">
-                                                <i class="bi bi-calendar me-1"></i>Applied: Nov 9, 2025 • 
-                                                <i class="bi bi-clock ms-2 me-1"></i>Interview: Nov 15, 2025 at 2:00 PM
+                                                <i class="bi bi-calendar me-1"></i>
+                                                {#if job.applied_at}
+                                                    Applied: {formatDate(job.applied_at)}
+                                                {:else if job.delegated_at}
+                                                    Delegated: {formatDate(job.delegated_at)}
+                                                {:else}
+                                                    Saved: {formatDate(job.saved_at)}
+                                                {/if}
+                                                {#if job.next_interview_date}
+                                                    • <i class="bi bi-clock ms-2 me-1"></i>Interview: {formatDate(job.next_interview_date)}
+                                                {/if}
                                             </p>
                                             <div class="d-flex gap-2">
-                                                <span class="badge" style="background-color: #8b5cf6;">
-                                                    <i class="bi bi-people me-1"></i>Interviewing - Round 2
+                                                <span class="badge {getStatusBadgeClass(job.status)}" style={job.status === 'interviewing' ? 'background-color: #8b5cf6;' : ''}>
+                                                    <i class="bi bi-{job.status === 'saved' ? 'bookmark' : job.status === 'delegated' ? 'send' : job.status === 'applied' ? 'check-circle' : 'people'} me-1"></i>
+                                                    {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
                                                 </span>
                                             </div>
                                         </div>
@@ -194,259 +452,211 @@
                                                 </div>
                                             </div>
                                             <div class="mt-2">
-                                                <small class="text-muted">Last updated: 2 hours ago</small>
+                                                <small class="text-muted">Last updated: {formatDate(job.updated_at)}</small>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="mt-3 p-2 bg-light rounded">
-                                        <small>
-                                            <strong>Next Step:</strong> Prepare for technical interview with hiring manager. 
-                                            <a href="#" class="text-decoration-none">Review prep materials →</a>
-                                        </small>
-                                    </div>
+                                    {#if job.agent_notes}
+                                        <div class="mt-3 p-2 bg-light rounded">
+                                            <small>
+                                                <strong><i class="bi bi-person-circle me-1"></i>Agent Note:</strong> {job.agent_notes}
+                                            </small>
+                                        </div>
+                                    {/if}
                                 </div>
                             </div>
+                        {/each}
 
-                            <!-- Job Card 2 - Applied -->
-                            <div class="card mb-3">
-                                <div class="card-body">
-                                    <div class="row align-items-start">
-                                        <div class="col-md-1 text-center mb-3 mb-md-0">
-                                            <img src="https://ui-avatars.com/api/?name=DataFlow&background=10b981&color=fff&size=64" 
-                                                 alt="DataFlow" class="rounded" width="64" height="64">
-                                        </div>
-                                        <div class="col-md-7">
-                                            <div class="d-flex align-items-start mb-2">
-                                                <div class="flex-grow-1">
-                                                    <h5 class="mb-1">Product Manager</h5>
-                                                    <p class="text-muted mb-2">
-                                                        <strong>DataFlow Systems</strong> • Seattle, WA (Hybrid)
-                                                    </p>
-                                                </div>
-                                                <button class="btn btn-sm btn-link text-muted">
-                                                    <i class="bi bi-bookmark"></i>
-                                                </button>
-                                            </div>
-                                            <div class="mb-2">
-                                                <span class="badge bg-success me-2">$130k-$160k</span>
-                                                <span class="badge bg-light text-dark me-2">Full-time</span>
-                                                <span class="badge bg-light text-dark">Hybrid</span>
-                                            </div>
-                                            <p class="mb-2 small text-muted">
-                                                <i class="bi bi-calendar me-1"></i>Applied: Nov 8, 2025 • 
-                                                <i class="bi bi-person ms-2 me-1"></i>Applied by: Michael Chen (Agent)
-                                            </p>
-                                            <div class="d-flex gap-2">
-                                                <span class="badge bg-success">
-                                                    <i class="bi bi-check-circle me-1"></i>Applied
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4 text-md-end">
-                                            <div class="d-grid gap-2 d-md-block">
-                                                <button class="btn btn-sm btn-primary mb-2 mb-md-0 me-md-2">
-                                                    <i class="bi bi-eye me-1"></i>View Details
-                                                </button>
-                                                <div class="dropdown d-inline-block">
-                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                        <i class="bi bi-three-dots"></i>
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil me-2"></i>Edit</a></li>
-                                                        <li><a class="dropdown-item" href="#"><i class="bi bi-chat-dots me-2"></i>Message Agent</a></li>
-                                                        <li><a class="dropdown-item" href="#"><i class="bi bi-file-text me-2"></i>Add Note</a></li>
-                                                        <li><hr class="dropdown-divider"></li>
-                                                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-x-circle me-2"></i>Mark as Rejected</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                            <div class="mt-2">
-                                                <small class="text-muted">Last updated: 1 day ago</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Job Card 3 - Delegated -->
-                            <div class="card mb-3">
-                                <div class="card-body">
-                                    <div class="row align-items-start">
-                                        <div class="col-md-1 text-center mb-3 mb-md-0">
-                                            <img src="https://ui-avatars.com/api/?name=Stripe&background=635bff&color=fff&size=64" 
-                                                 alt="Stripe" class="rounded" width="64" height="64">
-                                        </div>
-                                        <div class="col-md-7">
-                                            <div class="d-flex align-items-start mb-2">
-                                                <div class="flex-grow-1">
-                                                    <h5 class="mb-1">Senior PM, Platform</h5>
-                                                    <p class="text-muted mb-2">
-                                                        <strong>Stripe</strong> • San Francisco, CA (Remote)
-                                                    </p>
-                                                </div>
-                                                <button class="btn btn-sm btn-link text-warning">
-                                                    <i class="bi bi-bookmark-fill"></i>
-                                                </button>
-                                            </div>
-                                            <div class="mb-2">
-                                                <span class="badge bg-success me-2">$160k-$200k</span>
-                                                <span class="badge bg-light text-dark me-2">Full-time</span>
-                                                <span class="badge bg-light text-dark">Remote</span>
-                                            </div>
-                                            <p class="mb-2 small text-muted">
-                                                <i class="bi bi-calendar me-1"></i>Saved: Nov 6, 2025 • 
-                                                <i class="bi bi-send ms-2 me-1"></i>Delegated to agent: Nov 7, 2025
-                                            </p>
-                                            <div class="d-flex gap-2">
-                                                <span class="badge bg-primary">
-                                                    <i class="bi bi-send me-1"></i>Delegated - Agent reviewing
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4 text-md-end">
-                                            <div class="d-grid gap-2 d-md-block">
-                                                <button class="btn btn-sm btn-primary mb-2 mb-md-0 me-md-2">
-                                                    <i class="bi bi-eye me-1"></i>View Details
-                                                </button>
-                                                <div class="dropdown d-inline-block">
-                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                        <i class="bi bi-three-dots"></i>
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil me-2"></i>Edit</a></li>
-                                                        <li><a class="dropdown-item" href="#"><i class="bi bi-chat-dots me-2"></i>Message Agent</a></li>
-                                                        <li><a class="dropdown-item" href="#"><i class="bi bi-file-text me-2"></i>Add Note</a></li>
-                                                        <li><hr class="dropdown-divider"></li>
-                                                        <li><a class="dropdown-item" href="#"><i class="bi bi-x-circle me-2"></i>Withdraw</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                            <div class="mt-2">
-                                                <small class="text-muted">Last updated: 3 days ago</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mt-3 p-2 bg-light rounded">
-                                        <small>
-                                            <strong><i class="bi bi-person-circle me-1"></i>Agent Note:</strong> Great fit for your skills! Tailoring your resume and will submit by end of week.
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Job Card 4 - Saved -->
-                            <div class="card mb-3">
-                                <div class="card-body">
-                                    <div class="row align-items-start">
-                                        <div class="col-md-1 text-center mb-3 mb-md-0">
-                                            <img src="https://ui-avatars.com/api/?name=Airbnb&background=ff5a5f&color=fff&size=64" 
-                                                 alt="Airbnb" class="rounded" width="64" height="64">
-                                        </div>
-                                        <div class="col-md-7">
-                                            <div class="d-flex align-items-start mb-2">
-                                                <div class="flex-grow-1">
-                                                    <h5 class="mb-1">Product Manager, Core Platform</h5>
-                                                    <p class="text-muted mb-2">
-                                                        <strong>Airbnb</strong> • San Francisco, CA (Hybrid)
-                                                    </p>
-                                                </div>
-                                                <button class="btn btn-sm btn-link text-warning">
-                                                    <i class="bi bi-bookmark-fill"></i>
-                                                </button>
-                                            </div>
-                                            <div class="mb-2">
-                                                <span class="badge bg-success me-2">$150k-$185k</span>
-                                                <span class="badge bg-light text-dark me-2">Full-time</span>
-                                                <span class="badge bg-light text-dark">Hybrid</span>
-                                            </div>
-                                            <p class="mb-2 small text-muted">
-                                                <i class="bi bi-calendar me-1"></i>Saved: Nov 5, 2025 • 
-                                                <i class="bi bi-link-45deg ms-2 me-1"></i>Source: LinkedIn
-                                            </p>
-                                            <div class="d-flex gap-2">
-                                                <span class="badge bg-warning text-dark">
-                                                    <i class="bi bi-bookmark me-1"></i>Saved
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4 text-md-end">
-                                            <div class="d-grid gap-2 d-md-block">
-                                                <button class="btn btn-sm btn-primary mb-2 mb-md-0 me-md-2">
-                                                    <i class="bi bi-send me-1"></i>Delegate to Agent
-                                                </button>
-                                                <div class="dropdown d-inline-block">
-                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                        <i class="bi bi-three-dots"></i>
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item" href="#"><i class="bi bi-eye me-2"></i>View Details</a></li>
-                                                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil me-2"></i>Edit</a></li>
-                                                        <li><a class="dropdown-item" href="#"><i class="bi bi-chat-dots me-2"></i>Message Agent</a></li>
-                                                        <li><hr class="dropdown-divider"></li>
-                                                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-bookmark-x me-2"></i>Remove</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                            <div class="mt-2">
-                                                <small class="text-muted">Last updated: 5 days ago</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Pagination -->
+                        <!-- Pagination -->
+                        {#if totalPages > 1}
                             <nav>
                                 <ul class="pagination justify-content-center">
-                                    <li class="page-item disabled">
-                                        <a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a>
+                                    <li class="page-item" class:disabled={currentPage === 1}>
+                                        <button class="page-link" on:click={() => currentPage = Math.max(1, currentPage - 1)}>
+                                            <i class="bi bi-chevron-left"></i>
+                                        </button>
                                     </li>
-                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">4</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">5</a></li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a>
+                                    {#each Array(totalPages) as _, i}
+                                        <li class="page-item" class:active={currentPage === i + 1}>
+                                            <button class="page-link" on:click={() => currentPage = i + 1}>{i + 1}</button>
+                                        </li>
+                                    {/each}
+                                    <li class="page-item" class:disabled={currentPage === totalPages}>
+                                        <button class="page-link" on:click={() => currentPage = Math.min(totalPages, currentPage + 1)}>
+                                            <i class="bi bi-chevron-right"></i>
+                                        </button>
                                     </li>
                                 </ul>
                             </nav>
-                        </div>
-
-                        <!-- Other tabs would have similar content filtered by status -->
-                        <div class="tab-pane fade" id="saved-jobs">
-                            <div class="text-center py-5">
-                                <i class="bi bi-bookmark" style="font-size: 4rem; color: #f59e0b;"></i>
-                                <h4 class="mt-3">Saved Jobs</h4>
-                                <p class="text-muted">Jobs you've bookmarked for later review</p>
-                            </div>
-                        </div>
-
-                        <div class="tab-pane fade" id="delegated-jobs">
-                            <div class="text-center py-5">
-                                <i class="bi bi-send" style="font-size: 4rem; color: #3b82f6;"></i>
-                                <h4 class="mt-3">Delegated to Agent</h4>
-                                <p class="text-muted">Jobs your agent is reviewing and preparing applications for</p>
-                            </div>
-                        </div>
-
-                        <div class="tab-pane fade" id="applied-jobs">
-                            <div class="text-center py-5">
-                                <i class="bi bi-check-circle" style="font-size: 4rem; color: #10b981;"></i>
-                                <h4 class="mt-3">Applied Jobs</h4>
-                                <p class="text-muted">Applications that have been submitted</p>
-                            </div>
-                        </div>
-
-                        <div class="tab-pane fade" id="interviewing-jobs">
-                            <div class="text-center py-5">
-                                <i class="bi bi-people" style="font-size: 4rem; color: #8b5cf6;"></i>
-                                <h4 class="mt-3">Interviewing</h4>
-                                <p class="text-muted">Jobs where you're in the interview process</p>
-                            </div>
-                        </div>
-                    </div>
+                        {/if}
+                    {/if}
                 </div>
+            </div>
+        {/if}
+    </div>
+</div>
 
-                </div>
-                </div>
+<style>
+    /* ------------------ General ------------------ */
+    .page-section {
+        padding: 1rem 0.5rem;
+    }
+    
+    .text-muted {
+        font-size: 0.9rem;
+    }
+    
+    /* ------------------ Stats Cards ------------------ */
+    .stat-card {
+        border-left: 4px solid #f59e0b;
+        transition: transform 0.2s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .stat-card h3 {
+        font-size: 1.5rem;
+    }
+    
+    .stat-card p {
+        font-size: 0.85rem;
+    }
+    
+    /* ------------------ Filters ------------------ */
+    .card .form-label {
+        font-size: 0.85rem;
+    }
+    
+    .card .form-select,
+    .card input {
+        font-size: 0.85rem;
+        height: calc(1.5em + 0.75rem + 2px);
+    }
+    
+    /* Make filters stack on mobile */
+    @media (max-width: 767px) {
+        .card .row.g-2 > div {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+    
+    /* ------------------ Job Cards ------------------ */
+    .card-body img {
+        max-width: 64px;
+        max-height: 64px;
+        object-fit: cover;
+    }
+    
+    .card .d-flex.flex-wrap {
+        gap: 0.25rem;
+    }
+    
+    .card h5 {
+        font-size: 1rem;
+    }
+    
+    .card p {
+        font-size: 0.85rem;
+    }
+    
+    .card .badge {
+        font-size: 0.75rem;
+        padding: 0.25em 0.5em;
+    }
+    
+    /* Stack job card content on small screens */
+    @media (max-width: 767px) {
+        .card .row.g-2 {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    
+        .card .text-md-end {
+            text-align: left !important;
+            width: 100%;
+        }
+    
+        .card .d-grid {
+            display: grid !important;
+            width: 100%;
+        }
+    
+        .card .d-grid button {
+            width: 100%;
+        }
+    
+        .card .dropdown-menu {
+            min-width: 100%;
+        }
+    }
+    
+    /* ------------------ Buttons ------------------ */
+    .btn {
+        font-size: 0.85rem;
+        padding: 0.45rem 0.75rem;
+    }
+    
+    .btn i {
+        font-size: 0.9rem;
+    }
+    
+    /* ------------------ Tabs ------------------ */
+    .nav-tabs .nav-link {
+        font-size: 0.85rem;
+        padding: 0.35rem 0.5rem;
+    }
+    
+    .nav-tabs .badge {
+        font-size: 0.7rem;
+        padding: 0.2em 0.35em;
+    }
+    
+    /* ------------------ Pagination ------------------ */
+    .pagination .page-link {
+        font-size: 0.85rem;
+        padding: 0.35rem 0.5rem;
+    }
+    
+    /* ------------------ Onboarding Message ------------------ */
+    .text-center i {
+        font-size: 3.5rem;
+    }
+    
+    .text-center h4 {
+        font-size: 1.25rem;
+    }
+    
+    .text-center p {
+        font-size: 0.85rem;
+    }
+    
+    /* ------------------ Mobile Specific ------------------ */
+    @media (max-width: 576px) {
+        .stat-card h3 {
+            font-size: 1.25rem;
+        }
+    
+        .card h5 {
+            font-size: 0.95rem;
+        }
+    
+        .card p {
+            font-size: 0.8rem;
+        }
+    
+        .btn {
+            font-size: 0.8rem;
+            padding: 0.4rem 0.6rem;
+        }
+    
+        .nav-tabs .nav-link {
+            font-size: 0.75rem;
+            padding: 0.3rem 0.4rem;
+        }
+    }
+    </style>
+    

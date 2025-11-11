@@ -57,11 +57,10 @@
 		const { error: candidateError } = await supabase.from('candidates').insert([
 			{
 				user_id: user.id,
+        full_name: fullName,
 				first_name,
 				last_name,
-				onboarding_status: 'started', // or null
-				profile_completeness: 0,
-				visibility: 'private'
+				visibility_level: 'private'
 			}
 		]);
 
@@ -76,7 +75,7 @@
 		messageType = 'success';
 
 		setTimeout(() => {
-			goto('/dashboard/candidate/onboarding');
+			goto('/candidate/onboarding');
 		}, 1000);
 
 		loading = false;

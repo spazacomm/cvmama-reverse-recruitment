@@ -246,7 +246,7 @@
                                <img
                                    class="rounded-circle"
                                    width="32"
-                                   src="/assets/images/users/avatar-1.jpg"
+                                   src="{profile?.avatar_url}"
                                    alt="avatar-3"
                                />
                            </span>
@@ -254,7 +254,7 @@
                        <div class="dropdown-menu dropdown-menu-end">
                            <!-- item-->
                            <h6 class="dropdown-header">{profile?.first_name}</h6>
-                           <a class="dropdown-item" href="pages-profile.html">
+                           <a class="dropdown-item" href="/candidate/profile">
                                <i
                                    class="bx bx-user-circle text-muted fs-18 align-middle me-1"
                                ></i
@@ -262,13 +262,13 @@
                            </a>
                            
 
-                           <a class="dropdown-item" href="pages-pricing.html">
+                           <a class="dropdown-item" href="/candidate/subscriptions">
                                <i
                                    class="bx bx-wallet text-muted fs-18 align-middle me-1"
                                ></i
                                ><span class="align-middle">Subscriptions</span>
                            </a>
-                           <a class="dropdown-item" href="pages-faqs.html">
+                           <a class="dropdown-item" href="/faq">
                                <i
                                    class="bx bx-help-circle text-muted fs-18 align-middle me-1"
                                ></i
