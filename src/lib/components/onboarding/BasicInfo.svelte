@@ -209,7 +209,7 @@
   <div class="row justify-content-center text-center mt-4">
     <div class="col-lg-8">
       <div class="mb-3">
-        <span class="badge bg-primary-subtle text-primary px-3 py-2">Step 1 of 4</span>
+        <!-- <span class="badge bg-primary-subtle text-primary px-3 py-2">Step 1 of 4</span> -->
       </div>
       <h3 class="fw-semibold mb-3">Welcome! Let's Get Started</h3>
       <p class="text-muted">
