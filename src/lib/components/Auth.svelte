@@ -1,4 +1,16 @@
 <script lang="ts">
+
+import { onMount, onDestroy } from 'svelte';
+
+	onMount(() => {
+		// Safe: runs only in the browser
+		document.body.classList.add('authentication-bg');
+
+		return () => {
+			document.body.classList.remove('authentication-bg');
+		};
+	});
+
     import { supabase } from "../supabaseClient";
   
     let loading = $state(false);
@@ -97,13 +109,13 @@
                   </div>
                 </form>
   
-                <p class="mt-3 fw-semibold text-center">OR sign with</p>
+                <!-- <p class="mt-3 fw-semibold text-center">OR sign with</p>
   
                 <div class="text-center">
                   <button class="btn btn-light shadow-none"><i class="bx bxl-google fs-20"></i></button>
                   <button class="btn btn-light shadow-none"><i class="bx bxl-facebook fs-20"></i></button>
                   <button class="btn btn-light shadow-none"><i class="bx bxl-github fs-20"></i></button>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>

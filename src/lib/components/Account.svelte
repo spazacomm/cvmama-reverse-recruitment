@@ -91,7 +91,7 @@
 								{session?.user?.user_metadata?.full_name ?? 'User'}
 							</h6>
 
-							<a class="dropdown-item" href="/candidate/profile">
+							<!-- <a class="dropdown-item" href="/candidate/profile">
 								<i class="bx bx-user-circle text-muted fs-18 align-middle me-1"></i>
 								<span class="align-middle">Profile</span>
 							</a>
@@ -99,7 +99,7 @@
 							<a class="dropdown-item" href="/candidate/subscriptions">
 								<i class="bx bx-wallet text-muted fs-18 align-middle me-1"></i>
 								<span class="align-middle">Subscriptions</span>
-							</a>
+							</a> -->
 
 							<a class="dropdown-item" href="/faq">
 								<i class="bx bx-help-circle text-muted fs-18 align-middle me-1"></i>

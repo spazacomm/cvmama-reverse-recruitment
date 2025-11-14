@@ -1,95 +1,48 @@
 <script lang="ts">
-	import { supabase } from '../supabaseClient';
+	import { supabase } from '$lib/supabaseClient';
 	import { onMount, createEventDispatcher } from 'svelte';
 	import type { AuthSession } from '@supabase/supabase-js';
 
-	import BasicInfo from './onboarding/BasicInfo.svelte';
-	import CareerInfo from './onboarding/CareerInfo.svelte';
-	import ResumeUpload from './onboarding/ResumeUpload.svelte';
-	import ConsentDefault from './onboarding/ConsentDefault.svelte';
-   
+	// ✅ Import onboarding steps config
+	import { onboardingSteps } from '$lib/config/onboardingSteps';
 
 	export let session: AuthSession | null = null;
 
-	let currentStep: string | null = null;
-	let candidateId: string | null = null;
-	let steps: any[] = [];
-	let loading = true;
-	let message = '';
-
-	const stepComponents = {
-		step1_basic_info: BasicInfo,
-		step2_career_info: CareerInfo,
-		step3_resume_upload: ResumeUpload,
-		step4_consents: ConsentDefault,
-        
-	};
-
 	const dispatch = createEventDispatcher();
+
+	let candidateId: string | null = null;
+	let steps: { step_name: string; status: string }[] = [];
+	let currentStep: string | null = null;
+	let loading = true;
 
 	onMount(async () => {
 		if (!session?.user) return;
+
 		loading = true;
 
+		// ✅ Fetch candidate ID
 		const { data: candidate } = await supabase
 			.from('candidates')
-			.select('id, onboarding_completed')
+			.select('id')
 			.eq('user_id', session.user.id)
 			.single();
 
 		if (!candidate) {
-			message = 'Candidate not found.';
 			loading = false;
 			return;
 		}
 
 		candidateId = candidate.id;
 
-		// ✅ If already completed, no need to fetch steps — immediately dispatch
-		if (candidate.onboarding_completed) {
-			dispatch('onboardingComplete');
-			loading = false;
-			return;
-		}
-
-		// Otherwise, continue checking steps
-		const { data: existingSteps, error } = await supabase
+		// ✅ Fetch existing steps
+		const { data: existingSteps } = await supabase
 			.from('candidate_onboarding_steps')
 			.select('*')
-			.eq('candidate_id', candidate.id);
+			.eq('candidate_id', candidateId);
 
-		if (error) {
-			console.error(error);
-			loading = false;
-			return;
-		}
+		steps = existingSteps || [];
 
-		if (!existingSteps?.length) {
-			const defaultSteps = Object.keys(stepComponents).map((step) => ({
-				candidate_id: candidate.id,
-				step_name: step,
-				status: 'pending'
-			}));
-			await supabase.from('candidate_onboarding_steps').insert(defaultSteps);
-			steps = defaultSteps;
-		} else {
-			steps = existingSteps;
-		}
-
-		// ✅ Check if all steps are already completed
-		const allDone = steps.every((s) => s.status === 'completed');
-		if (allDone) {
-			await supabase
-				.from('candidates')
-				.update({ onboarding_completed: true, updated_at: new Date().toISOString() })
-				.eq('id', candidateId);
-
-			dispatch('onboardingComplete');
-			loading = false;
-			return;
-		}
-
-		// Otherwise pick the next pending step
+		// ✅ Determine next pending step
 		const nextPending = steps.find((s) => s.status === 'pending');
 		currentStep = nextPending ? nextPending.step_name : null;
 
@@ -98,7 +51,7 @@
 
 	// ✅ When a step is completed
 	async function handleStepComplete() {
-		if (!candidateId || !currentStep) return;
+		if (!currentStep) return;
 
 		await supabase
 			.from('candidate_onboarding_steps')
@@ -106,17 +59,15 @@
 			.eq('candidate_id', candidateId)
 			.eq('step_name', currentStep);
 
-		const { data: updatedSteps } = await supabase
-			.from('candidate_onboarding_steps')
-			.select('*')
-			.eq('candidate_id', candidateId);
-
-		steps = updatedSteps || [];
+		// Update local steps array
+		steps = steps.map((s) =>
+			s.step_name === currentStep ? { ...s, status: 'completed' } : s
+		);
 
 		const nextPending = steps.find((s) => s.status === 'pending');
 		currentStep = nextPending ? nextPending.step_name : null;
 
-		// ✅ If all steps done — mark onboarding completed and dispatch event
+		// ✅ If no steps pending, mark onboarding complete
 		if (!nextPending) {
 			await supabase
 				.from('candidates')
@@ -131,18 +82,14 @@
 {#if loading}
 	<div class="text-center py-5">
 		<div class="spinner-border text-primary" role="status"></div>
-		<p class="mt-3">Loading onboarding steps...</p>
+		<p class="mt-3">Loading onboarding step...</p>
 	</div>
 {:else if currentStep}
 	<div class="container py-4">
 		<svelte:component
-			this={stepComponents[currentStep]}
+			this={onboardingSteps.find((s) => s.name === currentStep)?.component}
 			{session}
 			on:stepComplete={handleStepComplete}
 		/>
-	</div>
-{:else}
-	<div class="alert alert-success text-center my-5">
-		🎉 All onboarding steps are completed!
 	</div>
 {/if}

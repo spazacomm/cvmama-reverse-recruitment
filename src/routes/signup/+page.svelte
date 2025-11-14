@@ -1,4 +1,16 @@
 <script>
+
+import { onMount, onDestroy } from 'svelte';
+
+onMount(() => {
+  // Safe: runs only in the browser
+  document.body.classList.add('authentication-bg');
+
+  return () => {
+    document.body.classList.remove('authentication-bg');
+  };
+});
+
 	import { supabase } from '$lib/supabaseClient';
 	import { goto } from '$app/navigation';
 
@@ -75,7 +87,7 @@
 		messageType = 'success';
 
 		setTimeout(() => {
-			goto('/candidate/onboarding');
+			goto('/');
 		}, 1000);
 
 		loading = false;
@@ -83,7 +95,7 @@
 </script>
 
   
-  <div class="account-pages pt-2 pt-sm-5 pb-4 pb-sm-5">
+  <div class="authentication-bg account-pages pt-2 pt-sm-5 pb-4 pb-sm-5">
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-xl-5">
@@ -91,12 +103,12 @@
             <div class="card-body px-3 py-5">
               <div class="mx-auto mb-4 text-center auth-logo">
                 <a href="/" class="logo-dark">
-                  <img src="/assets/images/logo-sm.png" height="30" class="me-1" alt="logo sm" />
-                  <img src="/assets/images/logo-dark.png" height="24" alt="logo dark" />
+                  <!-- <img src="/assets/images/logo-sm.png" height="30" class="me-1" alt="logo sm" /> -->
+                  <img src="/assets/images/logo-dark.png" height="40" alt="logo dark" />
                 </a>
                 <a href="/" class="logo-light">
-                  <img src="/assets/images/logo-sm.png" height="30" class="me-1" alt="logo sm" />
-                  <img src="/assets/images/logo-light.png" height="24" alt="logo light" />
+                  <!-- <img src="/assets/images/logo-sm.png" height="30" class="me-1" alt="logo sm" /> -->
+                  <img src="/assets/images/logo-light.png" height="40" alt="logo light" />
                 </a>
               </div>
   
@@ -172,19 +184,19 @@
                   </div>
                 </form>
   
-                <p class="mt-3 fw-semibold text-center">OR sign with</p>
+                <!-- <p class="mt-3 fw-semibold text-center">OR sign with</p>
                 <div class="text-center">
                   <button class="btn btn-light shadow-none"><i class="bx bxl-google fs-20"></i></button>
                   <button class="btn btn-light shadow-none"><i class="bx bxl-facebook fs-20"></i></button>
                   <button class="btn btn-light shadow-none"><i class="bx bxl-github fs-20"></i></button>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
   
           <p class="text-white mb-0 text-center">
             I already have an account
-            <a href="/login" class="text-white fw-bold ms-1">Sign In</a>
+            <a href="/" class="text-white fw-bold ms-1">Sign In</a>
           </p>
         </div>
       </div>

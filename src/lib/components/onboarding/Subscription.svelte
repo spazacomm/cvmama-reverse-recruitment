@@ -1,11 +1,14 @@
 <script lang="ts">
 	import { supabase } from '$lib/supabaseClient';
-	import { onMount } from 'svelte';
+	import { onMount, createEventDispatcher} from 'svelte';
 	import { tick } from 'svelte';
 
 	export let session;
 	export let excludeTrial = false;
 	export let currentPlanId: string | null = null;
+
+	 
+    const dispatch = createEventDispatcher();
 
 	let plans = [];
 	let loading = true;
@@ -95,6 +98,14 @@
 				if (error) throw error;
 				currentPlanId = plan.id;
 				showToast('Trial activated! 🎉', 'success');
+
+				setTimeout(() => {
+          dispatch('subscriptionComplete', {
+            currentPlanId,
+            candidate.id
+          });
+        }, 1000);
+
 			} else {
 				// Paid subscription (mock)
 				await tick();
