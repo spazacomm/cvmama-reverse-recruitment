@@ -100,11 +100,12 @@
 				showToast('Trial activated! 🎉', 'success');
 
 				setTimeout(() => {
-          dispatch('subscriptionComplete', {
-            currentPlanId,
-            candidate.id
-          });
-        }, 1000);
+  dispatch('subscriptionComplete', {
+    currentPlanId,
+    candidate_id: candidate.id
+  });
+}, 1000);
+
 
 			} else {
 				// Paid subscription (mock)

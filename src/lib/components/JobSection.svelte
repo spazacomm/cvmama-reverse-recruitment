@@ -3,6 +3,7 @@
     import { onMount } from 'svelte';
     import { supabase } from '$lib/supabaseClient';
     import type { AuthSession } from '@supabase/supabase-js';
+	import JobCreation from './JobCreation.svelte';
   
     export let candidateId: string;
     export let session: AuthSession;
@@ -272,6 +273,12 @@
         console.error('Error deleting job:', error);
       }
     }
+
+    async function handleJobCreated(event) {
+    const newJob = event.detail;
+    console.log('Job created:', newJob);
+    // Refresh job list, show notification, etc.
+  }
   
     $: totalPages = Math.ceil(totalItems / itemsPerPage);
     $: pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -284,9 +291,8 @@
           <h5 class="mb-0">
             <i class="bx bx-briefcase text-primary me-2"></i>Your Jobs
           </h5>
-          <button class="btn btn-sm btn-primary">
-            <i class="bx bx-plus me-1"></i>Add Job
-          </button>
+         
+          <JobCreation {candidateId} on:jobCreated={handleJobCreated} />
         </div>
       </div>
   
@@ -330,10 +336,10 @@
               <i class="bx bx-briefcase-alt" style="font-size: 4rem; color: #ccc;"></i>
               <h5 class="mt-3 text-muted">No {activeTab} jobs yet</h5>
               <p class="text-muted">Start tracking your job applications</p>
-              <button class="btn btn-primary mt-2">
-                <i class="bx bx-plus me-1"></i>Add Your First Job
-              </button>
+              
+              
             </div>
+            
           {:else}
             <!-- Jobs List -->
             <div class="jobs-list">
@@ -479,233 +485,228 @@
     </div>
   </div>
   
-  <!-- Offcanvas for Job Details -->
-  {#if showOffcanvas && selectedJob}
-    <div class="offcanvas-backdrop fade {showOffcanvas ? 'show' : ''}" on:click={closeOffcanvas}></div>
-    <div class="offcanvas offcanvas-end {showOffcanvas ? 'show' : ''}" tabindex="-1">
-      <div class="offcanvas-header">
-        <div>
-          <h5 class="offcanvas-title">{selectedJob.job_title}</h5>
-          <p class="text-muted mb-0 small">{selectedJob.company_name}</p>
-        </div>
-        <button type="button" class="btn-close" on:click={closeOffcanvas}></button>
-      </div>
-  
-      <div class="offcanvas-body">
-        {#if loadingDetails}
-          <div class="text-center py-5">
-            <div class="spinner-border spinner-border-sm text-primary"></div>
-          </div>
-        {:else}
-          <!-- Job Overview -->
-          <div class="detail-section">
-            <h6 class="section-title">Overview</h6>
-            <div class="detail-grid">
-              <div class="detail-item-full">
-                <span class="detail-label">Status</span>
-                <div class="dropdown">
-                  <button 
-                    class="btn btn-sm btn-{statusColors[selectedJob.status]} dropdown-toggle text-capitalize"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                  >
-                    {selectedJob.status}
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li><button class="dropdown-item" on:click={() => updateJobStatus(selectedJob.id, 'saved')}>Saved</button></li>
-                    <li><button class="dropdown-item" on:click={() => updateJobStatus(selectedJob.id, 'delegated')}>Delegated</button></li>
-                    <li><button class="dropdown-item" on:click={() => updateJobStatus(selectedJob.id, 'applied')}>Applied</button></li>
-                    <li><button class="dropdown-item" on:click={() => updateJobStatus(selectedJob.id, 'interviewing')}>Interviewing</button></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><button class="dropdown-item" on:click={() => updateJobStatus(selectedJob.id, 'offered')}>Offered</button></li>
-                    <li><button class="dropdown-item" on:click={() => updateJobStatus(selectedJob.id, 'accepted')}>Accepted</button></li>
-                    <li><button class="dropdown-item text-danger" on:click={() => updateJobStatus(selectedJob.id, 'rejected')}>Rejected</button></li>
-                  </ul>
-                </div>
-              </div>
-  
-              {#if selectedJob.location}
-                <div class="detail-item-full">
-                  <span class="detail-label">Location</span>
-                  <span class="detail-value">
-                    <i class="bx bx-map me-1"></i>{selectedJob.location}
-                  </span>
-                </div>
-              {/if}
-  
-              {#if selectedJob.work_mode}
-                <div class="detail-item-full">
-                  <span class="detail-label">Work Mode</span>
-                  <span class="detail-value text-capitalize">
-                    <i class="bx {getWorkModeIcon(selectedJob.work_mode)} me-1"></i>
-                    {selectedJob.work_mode}
-                  </span>
-                </div>
-              {/if}
-  
-              {#if selectedJob.employment_type}
-                <div class="detail-item-full">
-                  <span class="detail-label">Employment Type</span>
-                  <span class="detail-value text-capitalize">{selectedJob.employment_type}</span>
-                </div>
-              {/if}
-  
-              {#if selectedJob.salary_min || selectedJob.salary_max}
-                <div class="detail-item-full">
-                  <span class="detail-label">Salary</span>
-                  <span class="detail-value">
-                    {formatSalary(selectedJob.salary_min, selectedJob.salary_max, selectedJob.salary_currency)}
-                  </span>
-                </div>
-              {/if}
-  
-              {#if selectedJob.source}
-                <div class="detail-item-full">
-                  <span class="detail-label">Source</span>
-                  <span class="detail-value text-capitalize">{selectedJob.source}</span>
-                </div>
-              {/if}
-            </div>
-  
-            {#if selectedJob.job_url || selectedJob.application_url || selectedJob.company_url}
-              <div class="mt-3 d-flex gap-2 flex-wrap">
-                {#if selectedJob.job_url}
-                  <a href={selectedJob.job_url} target="_blank" class="btn btn-sm btn-outline-primary">
-                    <i class="bx bx-link-external me-1"></i>View Job
-                  </a>
-                {/if}
-                {#if selectedJob.application_url}
-                  <a href={selectedJob.application_url} target="_blank" class="btn btn-sm btn-outline-success">
-                    <i class="bx bx-send me-1"></i>Apply Now
-                  </a>
-                {/if}
-                {#if selectedJob.company_url}
-                  <a href={selectedJob.company_url} target="_blank" class="btn btn-sm btn-outline-secondary">
-                    <i class="bx bx-building me-1"></i>Company
-                  </a>
-                {/if}
-              </div>
-            {/if}
-          </div>
-  
-          <!-- Notes -->
-          {#if selectedJob.candidate_notes || selectedJob.agent_notes}
-            <div class="detail-section">
-              <h6 class="section-title">Notes</h6>
-              {#if selectedJob.candidate_notes}
-                <div class="note-card">
-                  <div class="note-header">
-                    <i class="bx bx-user me-2 text-primary"></i>Your Notes
-                  </div>
-                  <p class="note-content">{selectedJob.candidate_notes}</p>
-                </div>
-              {/if}
-              {#if selectedJob.agent_notes}
-                <div class="note-card">
-                  <div class="note-header">
-                    <i class="bx bx-bot me-2 text-info"></i>Agent Notes
-                  </div>
-                  <p class="note-content">{selectedJob.agent_notes}</p>
-                </div>
-              {/if}
-            </div>
-          {/if}
-  
-          <!-- Documents -->
-          <div class="detail-section">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <h6 class="section-title mb-0">Documents</h6>
-              <button class="btn btn-sm btn-outline-primary">
-                <i class="bx bx-plus"></i>
-              </button>
-            </div>
-            {#if jobDocuments.length > 0}
-              <div class="document-list">
-                {#each jobDocuments as doc}
-                  <div class="document-item">
-                    <div class="document-icon">
-                      <i class="bx bx-file-{doc.document_type === 'resume' ? 'blank' : 'text'} text-primary"></i>
-                    </div>
-                    <div class="document-info">
-                      <div class="document-name">{doc.file_name}</div>
-                      <small class="text-muted">{(doc.file_size / 1024).toFixed(1)} KB • {formatDate(doc.created_at)}</small>
-                    </div>
-                    <a href={doc.file_path} target="_blank" class="btn btn-sm btn-ghost-primary">
-                      <i class="bx bx-download"></i>
-                    </a>
-                  </div>
-                {/each}
-              </div>
-            {:else}
-              <p class="text-muted text-center py-3 small">No documents attached</p>
-            {/if}
-          </div>
-  
-          <!-- Messages -->
-          <div class="detail-section">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <h6 class="section-title mb-0">Messages</h6>
-              <button class="btn btn-sm btn-outline-primary">
-                <i class="bx bx-message-square-add"></i>
-              </button>
-            </div>
-            {#if jobMessages.length > 0}
-              <div class="message-list">
-                {#each jobMessages as message}
-                  <div class="message-item">
-                    <img 
-                      src={message.sender?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(message.sender?.full_name || 'User')}&size=32`}
-                      alt={message.sender?.full_name}
-                      class="message-avatar"
-                    />
-                    <div class="message-content">
-                      <div class="message-header">
-                        <strong>{message.sender?.full_name || 'Agent'}</strong>
-                        <small class="text-muted">{formatDateTime(message.created_at)}</small>
-                      </div>
-                      <p class="message-text">{message.content}</p>
-                    </div>
-                  </div>
-                {/each}
-              </div>
-            {:else}
-              <p class="text-muted text-center py-3 small">No messages yet</p>
-            {/if}
-          </div>
-  
-          <!-- Activity Timeline -->
-          <div class="detail-section">
-            <h6 class="section-title">Activity Timeline</h6>
-            {#if jobActivities.length > 0}
-              <div class="timeline">
-                {#each jobActivities as activity}
-                  <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                      <p class="timeline-description">{activity.description}</p>
-                      <small class="text-muted">{formatDateTime(activity.created_at)}</small>
-                    </div>
-                  </div>
-                {/each}
-              </div>
-            {:else}
-              <p class="text-muted text-center py-3 small">No activity yet</p>
-            {/if}
-          </div>
-  
-          <!-- Actions -->
-          <div class="detail-section">
-            <div class="d-grid gap-2">
-              <button class="btn btn-danger" on:click={() => deleteJob(selectedJob.id)}>
-                <i class="bx bx-trash me-2"></i>Delete Job
-              </button>
-            </div>
-          </div>
-        {/if}
+  <!-- ========================= -->
+<!--   ENHANCED JOB OFFCANVAS  -->
+<!-- ========================= -->
+
+{#if showOffcanvas && selectedJob}
+<div class="offcanvas-backdrop fade show" on:click={closeOffcanvas}></div>
+
+<div class="offcanvas offcanvas-end show improved-offcanvas" tabindex="-1">
+  <!-- HEADER -->
+  <div class="offcanvas-header border-bottom pb-3">
+    <div>
+      <h4 class="fw-bold mb-1">{selectedJob.job_title}</h4>
+
+      <div class="d-flex align-items-center gap-2 text-muted small">
+        <i class='bx bx-buildings'></i>
+        {selectedJob.company_name}
       </div>
     </div>
-  {/if}
-  
+
+    <button type="button" class="btn-close" on:click={closeOffcanvas}></button>
+  </div>
+
+  <div class="offcanvas-body">
+    {#if loadingDetails}
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+      </div>
+    {:else}
+
+      <!-- ============================= -->
+      <!--     TOP ACTION BUTTONS       -->
+      <!-- ============================= -->
+      <div class="d-flex flex-column gap-2 mb-4">
+        <button 
+          class="btn btn-primary w-100 delegate-button"
+          on:click={() => updateJobStatus(selectedJob.id, 'delegated')}
+        >
+          <i class="bx bx-share-alt me-2"></i>Delegate to Agent
+        </button>
+
+        {#if selectedJob.application_url}
+          <a href={selectedJob.application_url} target="_blank" class="btn btn-outline-success w-100">
+            <i class="bx bx-send me-2"></i>Apply Now
+          </a>
+        {/if}
+      </div>
+
+
+      <!-- ========================= -->
+      <!--     OVERVIEW SECTION      -->
+      <!-- ========================= -->
+      <div class="detail-card mb-4">
+        <h6 class="section-title"><i class="bx bx-info-circle me-1"></i> Overview</h6>
+
+        <div class="overview-grid">
+          <div>
+            <small class="text-muted">Status</small>
+            <div class="dropdown">
+              <button class="btn btn-sm btn-{statusColors[selectedJob.status]} dropdown-toggle text-capitalize" data-bs-toggle="dropdown">
+                {selectedJob.status}
+              </button>
+              <ul class="dropdown-menu">
+                <li><button class="dropdown-item" on:click={() => updateJobStatus(selectedJob.id, 'saved')}>Saved</button></li>
+                <li><button class="dropdown-item" on:click={() => updateJobStatus(selectedJob.id, 'delegated')}>Delegated</button></li>
+                <li><button class="dropdown-item" on:click={() => updateJobStatus(selectedJob.id, 'applied')}>Applied</button></li>
+                <li><button class="dropdown-item" on:click={() => updateJobStatus(selectedJob.id, 'interviewing')}>Interviewing</button></li>
+                <li><hr class="dropdown-divider" /></li>
+                <li><button class="dropdown-item" on:click={() => updateJobStatus(selectedJob.id, 'offered')}>Offered</button></li>
+                <li><button class="dropdown-item" on:click={() => updateJobStatus(selectedJob.id, 'accepted')}>Accepted</button></li>
+                <li><button class="dropdown-item text-danger" on:click={() => updateJobStatus(selectedJob.id, 'rejected')}>Rejected</button></li>
+              </ul>
+            </div>
+          </div>
+
+          {#if selectedJob.location}
+            <div>
+              <small class="text-muted">Location</small>
+              <div class="fw-semibold">
+                <i class="bx bx-map me-1"></i> {selectedJob.location}
+              </div>
+            </div>
+          {/if}
+
+          {#if selectedJob.work_mode}
+            <div>
+              <small class="text-muted">Work Mode</small>
+              <div class="fw-semibold text-capitalize">
+                <i class="bx {getWorkModeIcon(selectedJob.work_mode)} me-1"></i>
+                {selectedJob.work_mode}
+              </div>
+            </div>
+          {/if}
+
+          {#if selectedJob.salary_min || selectedJob.salary_max}
+            <div>
+              <small class="text-muted">Salary</small>
+              <div class="fw-semibold">{formatSalary(selectedJob.salary_min, selectedJob.salary_max, selectedJob.salary_currency)}</div>
+            </div>
+          {/if}
+
+          {#if selectedJob.employment_type}
+            <div>
+              <small class="text-muted">Employment Type</small>
+              <div class="fw-semibold text-capitalize">{selectedJob.employment_type}</div>
+            </div>
+          {/if}
+        </div>
+      </div>
+
+
+      <!-- NOTES -->
+      {#if selectedJob.candidate_notes || selectedJob.agent_notes}
+        <div class="detail-card mb-4">
+          <h6 class="section-title"><i class="bx bx-notepad me-1"></i> Notes</h6>
+
+          {#if selectedJob.candidate_notes}
+            <div class="note-block">
+              <div class="note-title text-primary"><i class="bx bx-user me-1"></i> Your Notes</div>
+              <p class="note-text">{selectedJob.candidate_notes}</p>
+            </div>
+          {/if}
+
+          {#if selectedJob.agent_notes}
+            <div class="note-block">
+              <div class="note-title text-info"><i class="bx bx-bot me-1"></i> Agent Notes</div>
+              <p class="note-text">{selectedJob.agent_notes}</p>
+            </div>
+          {/if}
+        </div>
+      {/if}
+
+
+      <!-- DOCUMENTS -->
+      <div class="detail-card mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="section-title"><i class="bx bx-file me-1"></i> Documents</h6>
+          <button class="btn btn-sm btn-outline-primary"><i class="bx bx-plus"></i></button>
+        </div>
+
+        {#if jobDocuments.length > 0}
+          {#each jobDocuments as doc}
+            <div class="doc-item">
+              <i class="bx bx-file text-primary fs-4"></i>
+
+              <div>
+                <div class="fw-semibold">{doc.file_name}</div>
+                <small class="text-muted">{(doc.file_size / 1024).toFixed(1)} KB • {formatDate(doc.created_at)}</small>
+              </div>
+
+              <a href={doc.file_path} target="_blank" class="ms-auto btn btn-sm btn-light">
+                <i class="bx bx-download"></i>
+              </a>
+            </div>
+          {/each}
+        {:else}
+          <p class="text-muted small text-center py-3">No documents uploaded</p>
+        {/if}
+      </div>
+
+
+      <!-- MESSAGES -->
+      <div class="detail-card mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="section-title"><i class="bx bx-message-square-dots me-1"></i> Messages</h6>
+          <button class="btn btn-sm btn-outline-primary"><i class="bx bx-message-add"></i></button>
+        </div>
+
+        {#if jobMessages.length > 0}
+          {#each jobMessages as msg}
+            <div class="msg-item">
+              <img 
+                class="msg-avatar"
+                src={msg.sender?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(msg.sender?.full_name || 'User')}&size=32`}
+              />
+
+              <div class="msg-content">
+                <div class="d-flex justify-content-between">
+                  <strong>{msg.sender?.full_name}</strong>
+                  <small class="text-muted">{formatDateTime(msg.created_at)}</small>
+                </div>
+                <p class="msg-text">{msg.content}</p>
+              </div>
+            </div>
+          {/each}
+        {:else}
+          <p class="text-muted small text-center py-3">No messages yet</p>
+        {/if}
+      </div>
+
+
+      <!-- TIMELINE -->
+      <div class="detail-card mb-4">
+        <h6 class="section-title"><i class="bx bx-time-five me-1"></i> Activity Timeline</h6>
+
+        {#if jobActivities.length > 0}
+          {#each jobActivities as act}
+            <div class="timeline-line">
+              <div class="timeline-dot"></div>
+              <div class="timeline-info">
+                <div class="fw-semibold">{act.description}</div>
+                <small class="text-muted">{formatDateTime(act.created_at)}</small>
+              </div>
+            </div>
+          {/each}
+        {:else}
+          <p class="text-muted small text-center py-3">No activity recorded</p>
+        {/if}
+      </div>
+
+
+      <!-- DELETE -->
+      <div class="d-grid">
+        <button class="btn btn-danger" on:click={() => deleteJob(selectedJob.id)}>
+          <i class="bx bx-trash me-1"></i>Delete Job
+        </button>
+      </div>
+
+    {/if}
+  </div>
+</div>
+{/if}
+
   <style>
     @import url('https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css');
   
@@ -1290,4 +1291,94 @@
         grid-column: 1 / -1;
       }
     }
+
+    .improved-offcanvas {
+  width: 420px !important;
+  background: #f9fafb;
+  border-left: 1px solid #e5e7eb;
+}
+
+/* Card style sections */
+.detail-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Section headers */
+.section-title {
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+/* Overview grid */
+.overview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Notes */
+.note-block {
+  background: #f8f9fc;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+/* Documents */
+.doc-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px dashed #e5e7eb;
+}
+
+/* Messages */
+.msg-item {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.msg-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.msg-text {
+  margin-bottom: 0;
+}
+
+/* Timeline */
+.timeline-line {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.timeline-dot {
+  width: 10px;
+  height: 10px;
+  background: #6366f1;
+  border-radius: 50%;
+  margin-top: 6px;
+}
+
+.timeline-info small {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* Delegate button highlight */
+.delegate-button {
+  background: linear-gradient(45deg, #6366f1, #818cf8);
+  border: none;
+  font-weight: 600;
+}
+
   </style>
